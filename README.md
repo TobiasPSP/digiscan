@@ -101,7 +101,7 @@ Use an **A4-stepping** board for this build, with the chip marked **RP2350B0A4**
 
 ## Wiring
 
-![Logical wiring diagram](docs/images/wiring.png)
+![Logical wiring diagram](docs/images/wiring.webp)
 
 | From | To | Function |
 | --- | --- | --- |
@@ -114,7 +114,7 @@ Use an **A4-stepping** board for this build, with the chip marked **RP2350B0A4**
 
 These are **GPIO numbers, not connector pin positions**. Check the tablet connector against its board documentation and continuity measurements. The diagram shows logical terminals, not a physical board pinout.
 
-![Electrical connection schematic](docs/images/schematic.png)
+![Electrical connection schematic](docs/images/schematic.webp)
 
 Power both boards through separate USB connections. **Do not join their 5 V or 3.3 V rails.** UART is 3.3 V logic, not RS-232. Ground probes go to signal ground, not DUT battery/power terminals. Verify ground and signal voltage before attaching probes. This is not an isolated or level-shifting interface; do not directly attach 5 V or unknown-voltage signals. Keep wires short for the 2 Mbaud link.
 
@@ -141,7 +141,7 @@ Output is `.pio/build/tablet/firmware.bin`; build artifacts are deliberately not
 
 The header shows the tablet firmware revision beside START. Boot always opens **START**, synchronizes the RP link and starts unrestricted passive discovery. Valid traffic or a successful scan adds address tiles. Failed traffic alone cannot confirm an address. Once I2C is confirmed, the swipe hint appears and the other screens unlock. Tap an address tile to identify/assign a profile. Shared-register evidence is not a unique chip ID; ambiguities require a user choice. **Scan I2C** searches remaining addresses, skipping confirmed ones.
 
-![Confirmed START, simulated](docs/images/start.png)
+![Confirmed START, simulated](docs/images/start.webp)
 
 **NEW SESSION** clears temporary observations, filters, reports, graphs, recordings and diagnostics, while preserving assignments/settings. The gear menu's **RESET CONFIGURATION** additionally clears saved assignments/settings. Both require confirmation and retain installed chip definitions. Neither writes DUT settings. Reconnect preserves data and synchronizes state without blindly replaying commands.
 
@@ -155,7 +155,7 @@ Run/Pause controls capture; Pause freezes presentation fades. Clear resets obser
 
 The filter selects addresses, registers, R/W and Raw/Parsed/Both presentation. The change factor scales profile `atomic_step`; zero disables hysteresis and is the default. Tap an entry for full raw/decoded details and profile assignment.
 
-![Parsed monitor, simulated](docs/images/monitor.png)
+![Parsed monitor, simulated](docs/images/monitor.webp)
 
 Discover pauses on an undecided property/register group and offers Keep/Ignore with parsing details. Multi-register properties are reviewed together; unknown registers remain candidates. Decisions build a temporary filter that persists across Monitor view changes. Clear in Discover clears the decisions; an empty decision set never suppresses discovery.
 
@@ -163,8 +163,8 @@ Discover pauses on an undecided property/register group and offers Keep/Ignore w
 
 Reports collect profile-defined properties passively. Unseen values stay empty; successful values settle green, false booleans reddish, failures white/red. Later successful observations recover failed values. Read Missing, Read All and per-property Read actively acquire values and restore the previous capture state. Cancel stops a batch. Property details include raw values, visual bitmasks, friendly descriptions, access, formulas and technical masks/shifts. Address/profile bindings persist and can be changed from details.
 
-![Report readings, simulated](docs/images/reports.png)
-![Property details, simulated](docs/images/details.png)
+![Report readings, simulated](docs/images/reports.webp)
+![Property details, simulated](docs/images/details.webp)
 
 ### Graph
 
@@ -197,7 +197,7 @@ READ supports manual register lists, lengths, endianness and output formats with
 
 Diag consolidates baud/link health, queues, losses, capture faults and timing. Clock estimates use valid-frame timing, not proof of I2C compliance. Delivered transaction counts cannot prove that every physical edge was sampled.
 
-![Diagnostics, simulated](docs/images/diagnostics.png)
+![Diagnostics, simulated](docs/images/diagnostics.webp)
 
 ## Profiles And Tools
 
@@ -211,7 +211,11 @@ Get-TabletProfiles | Format-Table
 
 The self-contained module supports Windows PowerShell 5.1 and bundles YAML DLLs. Auto COM detection prompts if ambiguous. Replacing a chip always warns, even at the same version; `-Force` enables unattended replacement. Installation validates, pauses capture, uploads acknowledged chunks, verifies storage and reboots. Use the **tablet USB port**, not the RP2350 or UART bridge.
 
-See [tools/README.MD](tools/README.MD), [PROFILE-FORMAT.md](PROFILE-FORMAT.md) and [REPORT-SCHEMA.md](REPORT-SCHEMA.md).
+See:
+
+* [tools/README.MD](tools/README.MD)    
+* [PROFILE-FORMAT.md](PROFILE-FORMAT.md)   
+* [REPORT-SCHEMA.md](REPORT-SCHEMA.md).
 
 ## Implementation And Validation
 
