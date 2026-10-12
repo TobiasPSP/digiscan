@@ -1,0 +1,39 @@
+.program i2c_edge_capture
+
+; Paired words: countdown iterations, then state (bit 0 SDA, bit 1 SCL).
+; Input sampling is every 8 cycles on unchanged levels. Changed-state service
+; takes 15 cycles between samples; initial seed takes 11. Counter expiry takes
+; 18 cycles and emits an unchanged-state heartbeat. RXSTALL invalidates timing.
+    mov isr, null
+    in pins, 2
+    mov y, isr
+    mov osr, y
+    set x, 0
+    mov x, ~x
+    mov isr, null
+    push block
+    mov isr, y
+    push block
+    jmp sample
+.wrap_target
+sample:
+    mov isr, null
+    in pins, 2
+    mov y, isr
+    mov isr, x
+    mov x, osr
+    jmp x!=y emit
+    mov x, isr
+    jmp x-- sample
+    jmp emit
+emit:
+    mov x, isr
+    mov isr, ~x
+    push block
+    mov isr, y
+    push block
+    mov osr, y
+    set x, 0
+    mov x, ~x
+    jmp sample
+.wrap
