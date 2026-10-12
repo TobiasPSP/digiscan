@@ -7,7 +7,7 @@ I2C MONITOR is an instrument for observing, understanding, diagnosing and experi
 It consists of two parts:
 
 * **I2C Sniffer:**     
-  A simple RP2040 or RP2350 performs the wire tapping and only requires a few wires and no extra components. When you connect it to a PC via its USB-C connector, you can use [PowerShell scripts](tools\I2CMonitor) to display its readings, filter, parse, and much more.    
+  A simple RP2040 or RP2350 performs the wire tapping and only requires a few wires and no extra components. When you connect it to a PC via its USB-C connector, you can use [PowerShell scripts](https://github.com/TobiasPSP/digiscan/tree/main/tools) to display its readings, filter, parse, and much more.    
 * **ESP32-S3 Tablet Front-End:**   
   For portable use, add a *Guition ESP32-S3 3.5" tablet* and connect it to the UART interface of the Raspberry. This setup runs without PC stand-alone. The tablet has built-in battery support.
 
@@ -39,15 +39,15 @@ The project comes with profile files for IP2366, IP2368, and IP2369. Editable ch
 
 ## Firmware
 
-Full source code is provided in the folder [sourcecode](sourcecode). 
+Full source code is provided in the folder [sourcecode](https://github.com/TobiasPSP/digiscan/tree/main/sourcecode). 
 
-For the Raspberry, [compiled firmware](firmware) is available for RP2350 and RP2040. Note that RP2350 and RP2040 use different GPIO assignments for the I2C sniffer cable and UART.
+For the Raspberry, [compiled firmware](https://github.com/TobiasPSP/digiscan/tree/main/firmware) is available for RP2350 and RP2040. Note that RP2350 and RP2040 use different GPIO assignments for the I2C sniffer cable and UART.
 
 
 ## Software
-* If you use a ESP32-S3 tablet via UART, no additional software is required. The complete software part is integrated into the [tablet firmware](sourcecode\Tablet).
+* If you use a ESP32-S3 tablet via UART, no additional software is required. The complete software part is integrated into the [tablet firmware](https://github.com/TobiasPSP/digiscan/tree/main/sourcecode/Tablet).
 
-* If you use the Raspberry stand-alone, use the provided PowerShell scripts in [tools](tools).
+* If you use the Raspberry stand-alone, use the provided PowerShell scripts in [tools](https://github.com/TobiasPSP/digiscan/tree/main/tools).
   
 ### PC Software
 
