@@ -1,0 +1,2951 @@
+schema_version: 1
+device:
+  id: ip2369
+  name: IP2369 v1.0
+  profile_revision: 2
+  typical_addresses:
+  - 117
+  address: 117
+  register_address_bytes: 1
+filter_lists:
+  - name: USB Direction
+    registers: [0x0B, 0x31, 0x33, 0x34, 0x38]
+reports:
+  - header: All
+    groups:
+      - header: null
+        items: [All]
+  - header: Battery
+    groups:
+      - header: Overview
+        items: [0x50_1111111111111111, 0x6E_1111111111111111, 0x03_11111111]
+identification:
+  - register: 0x39
+    mask: 0xFF
+    min: 1
+    max: 255
+    class: C
+    source: IP2369 V1.10 p20; revision register not established as exclusive
+    label: Documented IC revision 1=B, 2=C, 3=D and later, manual p20, not exclusive
+  - register: 0x04
+    mask: 0x07
+    min: 2
+    max: 6
+    class: C
+    source: IP2369 V1.10 p6; valid cell configuration, shared with IP2366
+    label: Direct cell-count range, shared with IP2366
+graphs:
+  - header: Battery
+    lines:
+      - property: 0x50_1111111111111111
+        min: 0
+        max: 30000
+        color: 0x60D4E3
+        area: false
+      - property: 0x6E_1111111111111111
+        min: 0
+        max: 10000
+        color: 0xFFCD70
+        area: false
+provenance:
+  reference_path: C:\github\doneland_sources\Components\Power\Power Supplies\Battery\Chargers\Charge-Discharge\IP2369\IP2369 I2C\README.md
+  reference_url: https://done.land/components/power/powersupplies/battery/chargers/charge-discharge/ip2369/ip2369i2c/
+  reference_sha256: 3C319EFE743E52DB1818BB63C7A8947E9DD8C8A8C0910F73E5444487AB9D412B
+  manual: IP2369_AC Register Description Document V1.10, 2025-07-23, 26 pages
+  manual_sha256: 67E3DD9D59E2ABEC1D6DA102224E0BD5FC9564F94423FE7C3C4C2EBD88026308
+  derived: 2026-10-09
+  baseline: Cross-checked against user-supplied original register manual. Applies only to IP2369_AC per manual page 3. Residual ambiguities remain explicit. Not independently verified on IP2369 hardware.
+transport:
+  passive_only: false
+  active_read:
+    protocol: single_byte_pointer_restart
+    clock_Hz: 10000
+    max_registers: 3
+policy:
+  assembly: Per-address low-first consecutive target reads; max tablet arrival gap 1 s
+  physical_units: Apply documented reference formulas once into mV, mA, mW, degC, uA, s or cells. Do not infer current sign or undocumented enum codes.
+properties:
+- id: r00_en_loadotp
+  name: En_LOADOTP
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 5; cross-checked with supplied Markdown
+  note: ""
+  description: 1 = reset/register defaults loaded at power-on wake; recommended to leaving enabled
+  friendlydesc: 1 = reset/register defaults loaded at power-on wake; recommended to leaving enabled
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: No default-register reload at boot/wake
+    "1":
+      status: "YES"
+      interpretation: Default-register reload at boot/wake enabled
+- id: r00_en_resetmcu
+  name: En_RESETMCU
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 5; cross-checked with supplied Markdown
+  note: ""
+  description: write 1 to reset registers to defaults; bit returns to 0; wait about 2 s before subsequent register access
+  friendlydesc: write 1 to reset registers to defaults; bit returns to 0; wait about 2 s before subsequent register access
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: No reset request asserted; does not prove completion
+    "1":
+      status: "YES"
+      interpretation: Reset-to-defaults request; self-clears; wait 2 s after reset
+- id: r00_en_vbus_sinkdpdm
+  name: En_Vbus_SinkDPdM
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 5; cross-checked with supplied Markdown
+  note: ""
+  description: USB-C input DP/DM fast-charge enable
+  friendlydesc: USB-C input DP/DM fast-charge enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Input DP/DM fast-charge negotiation disabled
+    "1":
+      status: "YES"
+      interpretation: Input DP/DM fast-charge negotiation enabled
+- id: r00_en_vbus_sinkpd
+  name: En_Vbus_SinkPd
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 5; cross-checked with supplied Markdown
+  note: ""
+  description: USB-C input PD fast-charge enable
+  friendlydesc: USB-C input PD fast-charge enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Input PD negotiation disabled
+    "1":
+      status: "YES"
+      interpretation: Input PD negotiation enabled
+- id: r00_en_vbus_sinkscp
+  name: En_Vbus_SinkSCP
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 5; cross-checked with supplied Markdown
+  note: ""
+  description: USB-C input SCP enable; AC solution requires corresponding customization/support
+  friendlydesc: USB-C input SCP enable; AC solution requires corresponding customization/support
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Input SCP negotiation disabled
+    "1":
+      status: "YES"
+      interpretation: Input SCP negotiation enabled
+- id: r00_en_ppath
+  name: En_ppath
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 5; cross-checked with supplied Markdown
+  note: ""
+  description: 5 V simultaneous charge/discharge power-path function; 0 gives charging priority
+  friendlydesc: 5 V simultaneous charge/discharge power-path function; 0 gives charging priority
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: 5 V simultaneous charge/discharge power-path function; 0 gives charging priority
+- id: r00_en_charger
+  name: En_Charger
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x1
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 5; cross-checked with supplied Markdown
+  note: ""
+  description: charging enable
+  friendlydesc: charging enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Charging disabled
+    "1":
+      status: "YES"
+      interpretation: Charging enabled; not proof of current flow
+- id: r01_en_vbus_src_mos
+  name: En_Vbus_Src_Mos
+  registers:
+  - 0x01
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 6; cross-checked with supplied Markdown
+  note: ""
+  description: VBUS output-path MOS enable
+  friendlydesc: VBUS output-path MOS enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: VBUS output-path MOS enable
+- id: r01_en_vin_src_mos
+  name: En_Vin_Src_Mos
+  registers:
+  - 0x01
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 6; cross-checked with supplied Markdown
+  note: ""
+  description: VOUT1 output-path MOS enable
+  friendlydesc: VOUT1 output-path MOS enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: VOUT1 output-path MOS enable
+- id: r01_en_vbus_sink_mos
+  name: En_Vbus_Sink_Mos
+  registers:
+  - 0x01
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 6; cross-checked with supplied Markdown
+  note: ""
+  description: VBUS input-path MOS enable
+  friendlydesc: VBUS input-path MOS enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: VBUS input-path MOS enable
+- id: r02_vset
+  name: Cell target voltage
+  registers:
+  - 0x02
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 10
+  offset: 2500
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 190
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 6; cross-checked with supplied Markdown
+  note: ""
+  description: Vcell = N × 10 mV + 2500 mV; maximum 4.4 V
+  friendlydesc: Vcell = N × 10 mV + 2500 mV; maximum 4.4 V
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r03_iset
+  name: Battery current limit
+  registers:
+  - 0x03
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 100
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 97
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 6; cross-checked with supplied Markdown
+  note: ""
+  description: Ilimit = N × 100 mA; maximum 9.7 A
+  friendlydesc: Ilimit = N × 100 mA; maximum 9.7 A
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r04_bat_num
+  name: Series cells
+  registers:
+  - 0x04
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x7
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: cells
+  precision: 0
+  enum: {}
+  valid_min: 2
+  valid_max: 6
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 6; cross-checked with supplied Markdown
+  note: ""
+  description: series-cell count; Bat_Num = N, documented range 2–6
+  friendlydesc: series-cell count; Bat_Num = N, documented range 2–6
+  access: R/W
+  atomic_step: 0
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r06_itk
+  name: Trickle current
+  registers:
+  - 0x06
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 50
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 7; cross-checked with supplied Markdown
+  note: ""
+  description: Itrickle = N × 50 mA
+  friendlydesc: Itrickle = N × 50 mA
+  access: R/W
+  atomic_step: 50
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r08_istop
+  name: Termination current
+  registers:
+  - 0x08
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xF0
+  shift: 4
+  scale: 50
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 15
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 7; cross-checked with supplied Markdown
+  note: ""
+  description: 'charge termination current: Istop = N × 50 mA'
+  friendlydesc: 'charge termination current: Istop = N × 50 mA'
+  access: R/W
+  atomic_step: 50
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r08_vrch
+  name: Vrch
+  registers:
+  - 0x08
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xC
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": No recharge
+    "1": 50 mV per cell below target
+    "2": 100 mV per cell below target
+    "3": 200 mV per cell below target
+  valid_min: 0
+  valid_max: 3
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 7; cross-checked with supplied Markdown
+  note: ""
+  description: recharge threshold encoding
+  friendlydesc: recharge threshold encoding
+  access: R/W
+- id: r08_chg_ovtime
+  name: Chg_OvTime
+  registers:
+  - 0x08
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Disable after full / timeout on
+    "1": Keep enabled / timeout off
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 7; cross-checked with supplied Markdown
+  note: ""
+  description: charge-enable / timeout behavior after full charge
+  friendlydesc: charge-enable / timeout behavior after full charge
+  access: R/W
+- id: r09_en_standby
+  name: En_Standby
+  registers:
+  - 0x09
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 7-8; cross-checked with supplied Markdown
+  note: ""
+  description: standby enable
+  friendlydesc: standby enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Standby entry disabled
+    "1":
+      status: "YES"
+      interpretation: Standby entry permitted
+- id: r09_standby
+  name: Standby
+  registers:
+  - 0x09
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 7-8; cross-checked with supplied Markdown
+  note: ""
+  description: write 1 for one-shot immediate standby in non-charging condition; bit 7 must be enabled
+  friendlydesc: write 1 for one-shot immediate standby in non-charging condition; bit 7 must be enabled
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Normal standby workflow
+    "1":
+      status: "YES"
+      interpretation: One-shot standby request; requires bit 7 and non-charging state
+- id: r09_en_bat_low
+  name: En_BAT_Low
+  registers:
+  - 0x09
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 7-8; cross-checked with supplied Markdown
+  note: ""
+  description: 5 V low-voltage shutdown mode
+  friendlydesc: 5 V low-voltage shutdown mode
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Fixed 5 V low-battery shutdown disabled
+    "1":
+      status: "YES"
+      interpretation: Fixed 5 V software shutdown enabled; precharge threshold also changes
+- id: r09_standby_mode
+  name: Standby_Mode
+  registers:
+  - 0x09
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 10 uA standby (D)
+    "1": 100 uA standby (D)
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 7-8; cross-checked with supplied Markdown
+  note: ""
+  description: D-version-only standby current selection
+  friendlydesc: D-version-only standby current selection
+  access: R/W
+- id: r0a_set_batlow
+  name: Undervoltage base /cell
+  registers:
+  - 0x0A
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xE0
+  shift: 5
+  scale: 100
+  offset: 2500
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8; cross-checked with supplied Markdown
+  note: Per-cell component only. Complete threshold also depends on correction sign, magnitude and series-cell count.
+  description: base battery low-voltage code
+  friendlydesc: base battery low-voltage code
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r0a_adjust_en
+  name: Adjust_En
+  registers:
+  - 0x0A
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Subtract correction
+    "1": Add correction
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8; cross-checked with supplied Markdown
+  note: ""
+  description: selects subtract/add correction
+  friendlydesc: selects subtract/add correction
+  access: R/W
+- id: r0a_adjust_data
+  name: Undervoltage correction /cell
+  registers:
+  - 0x0A
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x7
+  shift: 0
+  scale: 100
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8; cross-checked with supplied Markdown
+  note: Per-cell component only. Complete threshold also depends on correction sign, magnitude and series-cell count.
+  description: correction magnitude
+  friendlydesc: correction magnitude
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r0b_en_dc_dc_output
+  name: En_Dc-Dc_Output
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8-9; cross-checked with supplied Markdown
+  note: ""
+  description: discharge/DC-DC output enable
+  friendlydesc: discharge/DC-DC output enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Discharge output disabled
+    "1":
+      status: "YES"
+      interpretation: Discharge output enabled; not proof of current flow
+- id: r0b_en_vbus_src_dpdm
+  name: En_Vbus_Src_DPdM
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8-9; cross-checked with supplied Markdown
+  note: ""
+  description: USB-C output DP/DM fast-charge enable
+  friendlydesc: USB-C output DP/DM fast-charge enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: USB-C output DP/DM fast-charge enable
+- id: r0b_en_vbus_srcpd
+  name: En_Vbus_SrcPd
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8-9; cross-checked with supplied Markdown
+  note: ""
+  description: USB-C output PD enable
+  friendlydesc: USB-C output PD enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Output PD negotiation disabled
+    "1":
+      status: "YES"
+      interpretation: Output PD negotiation enabled
+- id: r0b_en_vbus_srcscp
+  name: En_Vbus_SrcSCP
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8-9; cross-checked with supplied Markdown
+  note: ""
+  description: USB-C output SCP enable
+  friendlydesc: USB-C output SCP enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Output SCP negotiation disabled
+    "1":
+      status: "YES"
+      interpretation: Output SCP negotiation enabled
+- id: r0b_en_vin_src_dpdm
+  name: En_Vin_Src_DPDM
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8-9; cross-checked with supplied Markdown
+  note: ""
+  description: VOUT1/USB-A DP/DM fast-charge enable
+  friendlydesc: VOUT1/USB-A DP/DM fast-charge enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: VOUT1/USB-A DP/DM fast-charge enable
+- id: r0b_en_vin_src_scp
+  name: En_Vin_Src_SCP
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8-9; cross-checked with supplied Markdown
+  note: ""
+  description: VOUT1/USB-A SCP enable
+  friendlydesc: VOUT1/USB-A SCP enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: VOUT1/USB-A SCP enable
+- id: r0b_en_drv_emi
+  name: EN_DRV_EMI
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 8-9; cross-checked with supplied Markdown
+  note: ""
+  description: chip-driven anti-EMI function
+  friendlydesc: chip-driven anti-EMI function
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: chip-driven anti-EMI function
+- id: r0c_vbus_src_power
+  name: Vbus_Src_Power
+  registers:
+  - 0x0C
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xE0
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 20 W
+    "1": 27 W
+    "2": 30 W
+    "3": 36 W
+    "4": 45 W
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 10; cross-checked with supplied Markdown
+  note: ""
+  description: VBUS output/input power selection
+  friendlydesc: VBUS output/input power selection
+  access: R/W
+- id: r0c_chg_power_en
+  name: Chg_Power_En
+  registers:
+  - 0x0C
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: ""
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 10; cross-checked with supplied Markdown; enable polarity cross-checked with matching IP2366 field
+  note: ""
+  description: independent maximum VBUS input-power selection enable
+  friendlydesc: independent maximum VBUS input-power selection enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: "Independent maximum VBUS input-power selection disabled."
+    "1":
+      status: "YES"
+      interpretation: "Independent maximum VBUS input-power selection enabled."
+- id: r0c_vbus_snk_power
+  name: Vbus_Snk_Power
+  registers:
+  - 0x0C
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x7
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 20 W
+    "1": 27 W
+    "2": 30 W
+    "3": 36 W
+    "4": 45 W
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 10; cross-checked with supplied Markdown
+  note: ""
+  description: independent VBUS input power selection
+  friendlydesc: independent VBUS input power selection
+  access: R/W
+- id: r0d_pdo_select
+  name: Pdo_select
+  registers:
+  - 0x0D
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x7
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Automatic
+    "1": 5 V
+    "2": 9 V
+    "3": 12 V
+    "4": 15 V
+    "5": 20 V
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 11; cross-checked with supplied Markdown
+  note: ' Described as selectable, but access is R; writes remain raw.'
+  description: selected charging PDO
+  friendlydesc: selected charging PDO
+  access: R
+- id: r10_temp_loop_en
+  name: Temp_Loop_En
+  registers:
+  - 0x10
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 11; cross-checked with supplied Markdown
+  note: ""
+  description: thermal power-reduction loop enable
+  friendlydesc: thermal power-reduction loop enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: thermal power-reduction loop enable
+- id: r10_temp_loop
+  name: Thermal loop threshold
+  registers:
+  - 0x10
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x7
+  shift: 0
+  scale: 5
+  offset: 80
+  unit: degC
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 11; cross-checked with supplied Markdown
+  note: ""
+  description: thermal threshold code
+  friendlydesc: thermal threshold code
+  access: R/W
+  atomic_step: 5
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r15_cc4_out
+  name: CC4_OUT
+  registers:
+  - 0x15
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": LOW / 5.1 kohm pull-down
+    "1": HIGH / 330 uA pull-up
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 11; cross-checked with supplied Markdown
+  note: ""
+  description: CC4 output control
+  friendlydesc: CC4 output control
+  access: R/W
+- id: r15_cc3_out
+  name: CC3_OUT
+  registers:
+  - 0x15
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": LOW / 5.1 kohm pull-down
+    "1": HIGH / 330 uA pull-up
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 11; cross-checked with supplied Markdown
+  note: ""
+  description: CC3 output control
+  friendlydesc: CC3 output control
+  access: R/W
+- id: r16_standby_time
+  name: Standby delay
+  registers:
+  - 0x16
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: s
+  precision: 0
+  enum: {}
+  valid_min: 2
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 12; cross-checked with supplied Markdown
+  note: ""
+  description: tstandby = N × 1 s; minimum 2 s
+  friendlydesc: tstandby = N × 1 s; minimum 2 s
+  access: R/W
+  atomic_step: 1
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r17_ntc_en
+  name: NTC_EN
+  registers:
+  - 0x17
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 12; cross-checked with supplied Markdown
+  note: ""
+  description: NTC high-/low-temperature protection enable
+  friendlydesc: NTC high-/low-temperature protection enable
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Battery NTC temperature protection disabled
+    "1":
+      status: "YES"
+      interpretation: Battery NTC temperature protection enabled
+- id: r22_vbus_mode_set
+  name: Vbus_Mode_Set
+  registers:
+  - 0x22
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xC0
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": UFP
+    "1": DFP
+    "3": DRP
+  valid_min: 0
+  valid_max: 3
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 12; cross-checked with supplied Markdown
+  note: ""
+  description: Type-C role
+  friendlydesc: Type-C role
+  access: R/W
+- id: r23_en_5vpdo_3a_2_4a
+  name: En_5VPdo_3A/2.4A
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 2400 mA
+    "1": 3000 mA
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 13; cross-checked with supplied Markdown
+  note: ""
+  description: 1 = 3 A; 0 = 2.4 A
+  friendlydesc: 1 = 3 A; 0 = 2.4 A
+  access: R/W
+- id: r23_en_pps2pdo_iset
+  name: En_Pps2Pdo_Iset
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 13; cross-checked with supplied Markdown
+  note: ""
+  description: enable programmable PPS2 current
+  friendlydesc: enable programmable PPS2 current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Custom PPS2 current setting disabled
+    "1":
+      status: "YES"
+      interpretation: Custom PPS2 current setting enabled
+- id: r23_en_pps1pdo_iset
+  name: En_Pps1Pdo_Iset
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 13; cross-checked with supplied Markdown
+  note: ""
+  description: enable programmable PPS1 current
+  friendlydesc: enable programmable PPS1 current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Custom PPS1 current setting disabled
+    "1":
+      status: "YES"
+      interpretation: Custom PPS1 current setting enabled
+- id: r23_en_20vpdo_iset
+  name: En_20VPdo_Iset
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 13; cross-checked with supplied Markdown
+  note: ""
+  description: enable programmable 20 V PDO current
+  friendlydesc: enable programmable 20 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Custom 20 V PDO current setting disabled
+    "1":
+      status: "YES"
+      interpretation: Custom 20 V PDO current setting enabled
+- id: r23_en_15vpdo_iset
+  name: En_15VPdo_Iset
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 13; cross-checked with supplied Markdown
+  note: ""
+  description: enable programmable 15 V PDO current
+  friendlydesc: enable programmable 15 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Custom 15 V PDO current setting disabled
+    "1":
+      status: "YES"
+      interpretation: Custom 15 V PDO current setting enabled
+- id: r23_en_12vpdo_iset
+  name: En_12VPdo_Iset
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 13; cross-checked with supplied Markdown
+  note: ""
+  description: enable programmable 12 V PDO current
+  friendlydesc: enable programmable 12 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Custom 12 V PDO current setting disabled
+    "1":
+      status: "YES"
+      interpretation: Custom 12 V PDO current setting enabled
+- id: r23_en_9vpdo_iset
+  name: En_9VPdo_Iset
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 13; cross-checked with supplied Markdown
+  note: ""
+  description: enable programmable 9 V PDO current
+  friendlydesc: enable programmable 9 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Custom 9 V PDO current setting disabled
+    "1":
+      status: "YES"
+      interpretation: Custom 9 V PDO current setting enabled
+- id: r23_en_5vpdo_iset
+  name: En_5VPdo_Iset
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x1
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 13; cross-checked with supplied Markdown
+  note: ""
+  description: enable programmable 5 V PDO current
+  friendlydesc: enable programmable 5 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Custom 5 V PDO current setting disabled
+    "1":
+      status: "YES"
+      interpretation: Custom 5 V PDO current setting enabled
+- id: r2b_en_src_pps2pdo
+  name: En_Src_Pps2Pdo
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 15; cross-checked with supplied Markdown
+  note: ""
+  description: advertise/enable PPS2 PDO
+  friendlydesc: advertise/enable PPS2 PDO
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: PPS2 PDO not advertised
+    "1":
+      status: "YES"
+      interpretation: PPS2 PDO advertising enabled
+- id: r2b_en_src_pps1pdo
+  name: En_Src_Pps1Pdo
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 15; cross-checked with supplied Markdown
+  note: ""
+  description: advertise/enable PPS1 PDO
+  friendlydesc: advertise/enable PPS1 PDO
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: PPS1 PDO not advertised
+    "1":
+      status: "YES"
+      interpretation: PPS1 PDO advertising enabled
+- id: r2b_en_src_20vpdo
+  name: En_Src_20VPdo
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 15; cross-checked with supplied Markdown
+  note: ""
+  description: advertise/enable 20 V PDO
+  friendlydesc: advertise/enable 20 V PDO
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: 20 V PDO not advertised
+    "1":
+      status: "YES"
+      interpretation: 20 V PDO advertising enabled
+- id: r2b_en_src_15vpdo
+  name: En_Src_15VPdo
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 15; cross-checked with supplied Markdown
+  note: ""
+  description: advertise/enable 15 V PDO
+  friendlydesc: advertise/enable 15 V PDO
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: 15 V PDO not advertised
+    "1":
+      status: "YES"
+      interpretation: 15 V PDO advertising enabled
+- id: r2b_en_src_12vpdo
+  name: En_Src_12VPdo
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 15; cross-checked with supplied Markdown
+  note: ""
+  description: advertise/enable 12 V PDO
+  friendlydesc: advertise/enable 12 V PDO
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: 12 V PDO not advertised
+    "1":
+      status: "YES"
+      interpretation: 12 V PDO advertising enabled
+- id: r2b_en_src_9vpdo
+  name: En_Src_9VPdo
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 15; cross-checked with supplied Markdown
+  note: ""
+  description: advertise/enable 9 V PDO
+  friendlydesc: advertise/enable 9 V PDO
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: 9 V PDO not advertised
+    "1":
+      status: "YES"
+      interpretation: 9 V PDO advertising enabled
+- id: r2c_en_20vpdo_add
+  name: EN_20VPDO_ADD
+  registers:
+  - 0x2C
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 16; cross-checked with supplied Markdown
+  note: ""
+  description: add 10 mA to 20 V PDO current
+  friendlydesc: add 10 mA to 20 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: 20 V PDO 10 mA increment disabled
+    "1":
+      status: "YES"
+      interpretation: 20 V PDO 10 mA increment enabled
+- id: r2c_en_15vpdo_add
+  name: EN_15VPDO_ADD
+  registers:
+  - 0x2C
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 16; cross-checked with supplied Markdown
+  note: ""
+  description: add 10 mA to 15 V PDO current
+  friendlydesc: add 10 mA to 15 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: 15 V PDO 10 mA increment disabled
+    "1":
+      status: "YES"
+      interpretation: 15 V PDO 10 mA increment enabled
+- id: r2c_en_12vpdo_add
+  name: EN_12VPDO_ADD
+  registers:
+  - 0x2C
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 16; cross-checked with supplied Markdown
+  note: ""
+  description: add 10 mA to 12 V PDO current
+  friendlydesc: add 10 mA to 12 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: 12 V PDO 10 mA increment disabled
+    "1":
+      status: "YES"
+      interpretation: 12 V PDO 10 mA increment enabled
+- id: r2c_en_9vpdo_add
+  name: EN_9VPDO_ADD
+  registers:
+  - 0x2C
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 16; cross-checked with supplied Markdown
+  note: ""
+  description: add 10 mA to 9 V PDO current
+  friendlydesc: add 10 mA to 9 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: 9 V PDO 10 mA increment disabled
+    "1":
+      status: "YES"
+      interpretation: 9 V PDO 10 mA increment enabled
+- id: r2c_en_5vpdo_add
+  name: EN_5VPDO_ADD
+  registers:
+  - 0x2C
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x1
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 16; cross-checked with supplied Markdown
+  note: ""
+  description: add 10 mA to 5 V PDO current
+  friendlydesc: add 10 mA to 5 V PDO current
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: 5 V PDO 10 mA increment disabled
+    "1":
+      status: "YES"
+      interpretation: 5 V PDO 10 mA increment enabled
+- id: r31_chg_state
+  name: Chg_State
+  registers:
+  - 0x31
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0xC0
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 5 V input
+    "1": High-voltage input
+  valid_min: 0
+  valid_max: 3
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 17; cross-checked with supplied Markdown
+  note: ""
+  description: 'input charging mode: 00 = 5 V input; 01 = high-voltage fast-charge input'
+  friendlydesc: 'input charging mode: 00 = 5 V input; 01 = high-voltage fast-charge input'
+  access: R
+- id: r31_chg_en
+  name: CHG_En
+  registers:
+  - 0x31
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 17; cross-checked with supplied Markdown
+  note: ""
+  description: 1 = charging state / VBUS valid; 0 = not charging
+  friendlydesc: 1 = charging state / VBUS valid; 0 = not charging
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Charging context not indicated
+    "1":
+      status: "YES"
+      interpretation: Charging context indicated; VBUS presence counts, not proof of BAT current
+- id: r31_chg_end
+  name: CHG_End
+  registers:
+  - 0x31
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 17; cross-checked with supplied Markdown
+  note: ""
+  description: 1 = charge complete
+  friendlydesc: 1 = charge complete
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Charge completion not indicated
+    "1":
+      status: "YES"
+      interpretation: Charge complete/full indicated
+- id: r31_output_en
+  name: Output_En
+  registers:
+  - 0x31
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 17; cross-checked with supplied Markdown
+  note: ""
+  description: 1 = discharge output open and no abnormality; 0 = output not open or discharge anomaly
+  friendlydesc: 1 = discharge output open and no abnormality; 0 = output not open or discharge anomaly
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Output not open or discharge abnormality
+    "1":
+      status: "YES"
+      interpretation: Discharge output open without indicated abnormality
+- id: r31_chg_state_detail
+  name: Chg_state
+  registers:
+  - 0x31
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x7
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Standby
+    "1": Trickle
+    "2": Constant current
+    "3": Constant voltage
+    "4": Charging / pre-init
+    "5": Full
+    "6": Timeout
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 17; cross-checked with supplied Markdown
+  note: ""
+  description: detailed charge state
+  friendlydesc: detailed charge state
+  access: R
+- id: r32_vbus_output_state
+  name: Vbus_Output_State
+  registers:
+  - 0x32
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 5 V output
+    "1": Fast-charge output
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 18; cross-checked with supplied Markdown
+  note: ""
+  description: 1 = VBUS fast-charge discharge; 0 = 5 V discharge
+  friendlydesc: 1 = VBUS fast-charge discharge; 0 = 5 V discharge
+  access: R
+- id: r32_vin_output_state
+  name: Vin_Output_State
+  registers:
+  - 0x32
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 5 V output
+    "1": Fast-charge output
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 18; cross-checked with supplied Markdown
+  note: ""
+  description: 1 = VOUT1 fast-charge discharge; 0 = 5 V discharge
+  friendlydesc: 1 = VOUT1 fast-charge discharge; 0 = 5 V discharge
+  access: R
+- id: r32_mos_vbus
+  name: Mos_Vbus
+  registers:
+  - 0x32
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 18; cross-checked with supplied Markdown
+  note: ""
+  description: VBUS output MOS status
+  friendlydesc: VBUS output MOS status
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: MOS off
+    "1":
+      status: "YES"
+      interpretation: MOS on
+- id: r32_mos_vin
+  name: Mos_Vin
+  registers:
+  - 0x32
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 18; cross-checked with supplied Markdown
+  note: ""
+  description: VOUT1 output MOS status
+  friendlydesc: VOUT1 output MOS status
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: MOS off
+    "1":
+      status: "YES"
+      interpretation: MOS on
+- id: r32_at_same
+  name: At_Same
+  registers:
+  - 0x32
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Not in common placement
+    "1": In common placement
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 18; cross-checked with supplied Markdown
+  note: 0/1 mapping is explicit; the manual does not explain the physical meaning of common placement.
+  description: simultaneous/common-placement flag
+  friendlydesc: simultaneous/common-placement flag
+  access: R
+- id: r33_vbus_ok
+  name: Vbus_Ok
+  registers:
+  - 0x33
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 18; cross-checked with supplied Markdown
+  note: ""
+  description: VBUS input present
+  friendlydesc: VBUS input present
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: VBUS supply not indicated
+    "1":
+      status: "YES"
+      interpretation: VBUS supply present
+- id: r33_vbus_ov
+  name: Vbus_Ov
+  registers:
+  - 0x33
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 18; cross-checked with supplied Markdown
+  note: ""
+  description: VBUS input overvoltage
+  friendlydesc: VBUS input overvoltage
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: VBUS input overvoltage not indicated
+    "1":
+      status: "YES"
+      interpretation: VBUS input overvoltage indicated
+- id: r33_chg_vbus
+  name: Chg_Vbus
+  registers:
+  - 0x33
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x7
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "1": 5 V
+    "2": 7 V
+    "3": 9 V
+    "4": 12 V
+    "5": 15 V
+    "6": 20 V
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 18; cross-checked with supplied Markdown
+  note: ""
+  description: negotiated/input charging voltage
+  friendlydesc: negotiated/input charging voltage
+  access: R
+- id: r34_sink_ok
+  name: Sink_Ok
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: ""
+  description: Type-C sink/input connection valid
+  friendlydesc: Type-C sink/input connection valid
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: No valid Type-C sink connection indicated
+    "1":
+      status: "YES"
+      interpretation: Valid Type-C sink connection
+- id: r34_src_ok
+  name: Src_Ok
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: ""
+  description: Type-C source/output connection valid
+  friendlydesc: Type-C source/output connection valid
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: No valid Type-C source connection indicated
+    "1":
+      status: "YES"
+      interpretation: Valid Type-C source connection
+- id: r34_src_pd_ok
+  name: Src_Pd_Ok
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: ""
+  description: source-side PD connection valid
+  friendlydesc: source-side PD connection valid
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: No valid source PD connection indicated
+    "1":
+      status: "YES"
+      interpretation: Valid source PD connection
+- id: r34_sink_pd_ok
+  name: Sink_Pd_Ok
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: ""
+  description: sink-side PD connection valid
+  friendlydesc: sink-side PD connection valid
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: No valid sink PD connection indicated
+    "1":
+      status: "YES"
+      interpretation: Valid sink PD connection
+- id: r34_vbus_sink_qc_ok
+  name: Vbus_Sink_Qc_Ok
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: QC5V/PD5V indication does not guarantee that fast charging succeeded.
+  description: input fast-charge validity flag
+  friendlydesc: input fast-charge validity flag
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Input fast-charge indication not asserted; excludes QC/PD 5 V
+    "1":
+      status: "YES"
+      interpretation: Input fast-charge valid; excludes QC/PD 5 V
+- id: r34_vbus_src_qc_ok
+  name: Vbus_Src_Qc_Ok
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: QC5V/PD5V indication does not guarantee that fast charging succeeded.
+  description: output fast-charge validity flag
+  friendlydesc: output fast-charge validity flag
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Output fast-charge indication not asserted; excludes QC/PD 5 V
+    "1":
+      status: "YES"
+      interpretation: Output fast-charge valid; excludes QC/PD 5 V
+- id: r35_pdo_20v
+  name: PDO_20V
+  registers:
+  - 0x35
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: ""
+  description: 20 V PDO available/received
+  friendlydesc: 20 V PDO available/received
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: 20 V PDO available/received
+- id: r35_pdo_15v
+  name: PDO_15V
+  registers:
+  - 0x35
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: ""
+  description: 15 V PDO available/received
+  friendlydesc: 15 V PDO available/received
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: 15 V PDO available/received
+- id: r35_pdo_12v
+  name: PDO_12V
+  registers:
+  - 0x35
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: ""
+  description: 12 V PDO available/received
+  friendlydesc: 12 V PDO available/received
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: 12 V PDO available/received
+- id: r35_pdo_9v
+  name: PDO_9V
+  registers:
+  - 0x35
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: ""
+  description: 9 V PDO available/received
+  friendlydesc: 9 V PDO available/received
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: 9 V PDO available/received
+- id: r35_pdo_5v
+  name: PDO_5V
+  registers:
+  - 0x35
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x1
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 19; cross-checked with supplied Markdown
+  note: ""
+  description: 5 V PDO available/received
+  friendlydesc: 5 V PDO available/received
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: 5 V PDO available/received
+- id: r38_vsys_oc
+  name: Vsys_Oc
+  registers:
+  - 0x38
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 20; cross-checked with supplied Markdown
+  note: ' Write-to-clear contradicts the access table; no write interpretation enabled.'
+  description: latched VSYS overcurrent indication
+  friendlydesc: latched VSYS overcurrent indication
+  access: R; W1C unverified
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: No latched VSYS overcurrent indication
+    "1":
+      status: "YES"
+      interpretation: Latched VSYS overcurrent indication; not necessarily a current fault
+- id: r38_vsys_scdt
+  name: Vsys_Scdt
+  registers:
+  - 0x38
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 20; cross-checked with supplied Markdown
+  note: ' Write-to-clear contradicts the access table; no write interpretation enabled.'
+  description: latched VSYS short-circuit indication
+  friendlydesc: latched VSYS short-circuit indication
+  access: R; W1C unverified
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: No latched VSYS short-circuit indication
+    "1":
+      status: "YES"
+      interpretation: Latched VSYS short-circuit indication; not necessarily a current fault
+- id: r3a_temp_loop
+  name: Temp_Loop
+  registers:
+  - 0x3A
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 20; cross-checked with supplied Markdown; active-high polarity inferred from matching IP2366 field, not explicitly stated in this manual
+  note: Manual names a thermal-loop trigger flag but does not explicitly define 0/1 polarity. Active-high interpretation is provisional.
+  description: thermal-loop trigger flag
+  friendlydesc: thermal-loop trigger flag
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: thermal-loop trigger flag
+- id: r3a_ic_temp
+  name: Die temperature
+  registers:
+  - 0x3A
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x7F
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: degC
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 127
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 20; cross-checked with supplied Markdown
+  note: ""
+  description: chip temperature in °C
+  friendlydesc: chip temperature in °C
+  access: R
+  atomic_step: 1
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r24_pdo_current_24
+  name: 5 V PDO base current
+  registers:
+  - 0x24
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 14; cross-checked with supplied Markdown
+  note: Base setting only; the separate 0x2C adjustment can add 10 mA.
+  description: Advertised PDO current setting code; see reference formula. Not measured bus current.
+  friendlydesc: Configured advertised current, not measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display policy in mA; not current measurement accuracy.
+- id: r25_pdo_current_25
+  name: 9 V PDO base current
+  registers:
+  - 0x25
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 14; cross-checked with supplied Markdown
+  note: Base setting only; the separate 0x2C adjustment can add 10 mA.
+  description: Advertised PDO current setting code; see reference formula. Not measured bus current.
+  friendlydesc: Configured advertised current, not measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display policy in mA; not current measurement accuracy.
+- id: r26_pdo_current_26
+  name: 12 V PDO base current
+  registers:
+  - 0x26
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 14; cross-checked with supplied Markdown
+  note: Base setting only; the separate 0x2C adjustment can add 10 mA.
+  description: Advertised PDO current setting code; see reference formula. Not measured bus current.
+  friendlydesc: Configured advertised current, not measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display policy in mA; not current measurement accuracy.
+- id: r27_pdo_current_27
+  name: 15 V PDO base current
+  registers:
+  - 0x27
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 14; cross-checked with supplied Markdown
+  note: Base setting only; the separate 0x2C adjustment can add 10 mA.
+  description: Advertised PDO current setting code; see reference formula. Not measured bus current.
+  friendlydesc: Configured advertised current, not measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display policy in mA; not current measurement accuracy.
+- id: r28_pdo_current_28
+  name: 20 V PDO base current
+  registers:
+  - 0x28
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 14; cross-checked with supplied Markdown
+  note: Base setting only; the separate 0x2C adjustment can add 10 mA.
+  description: Advertised PDO current setting code; see reference formula. Not measured bus current.
+  friendlydesc: Configured advertised current, not measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display policy in mA; not current measurement accuracy.
+- id: r29_pdo_current_29
+  name: PPS1 PDO base current
+  registers:
+  - 0x29
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 50
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 15; cross-checked with supplied Markdown
+  note: ""
+  description: Advertised PDO current setting code; see reference formula. Not measured bus current.
+  friendlydesc: Configured advertised current, not measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display policy in mA; not current measurement accuracy.
+- id: r2a_pdo_current_2a
+  name: PPS2 PDO base current
+  registers:
+  - 0x2A
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 50
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 15; cross-checked with supplied Markdown
+  note: ""
+  description: Advertised PDO current setting code; see reference formula. Not measured bus current.
+  friendlydesc: Configured advertised current, not measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display policy in mA; not current measurement accuracy.
+- id: r69_timestamp_byte_1
+  name: Timestamp byte 1
+  registers:
+  - 0x69
+  operation: read
+  assembly: single
+  encoding: ascii
+  mask: 0xFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 22; cross-checked with supplied Markdown
+  note: ""
+  description: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  friendlydesc: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  access: R
+- id: r6a_timestamp_byte_2
+  name: Timestamp byte 2
+  registers:
+  - 0x6A
+  operation: read
+  assembly: single
+  encoding: ascii
+  mask: 0xFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 22; cross-checked with supplied Markdown
+  note: ""
+  description: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  friendlydesc: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  access: R
+- id: r6b_timestamp_byte_3
+  name: Timestamp byte 3
+  registers:
+  - 0x6B
+  operation: read
+  assembly: single
+  encoding: ascii
+  mask: 0xFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 23; cross-checked with supplied Markdown
+  note: ""
+  description: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  friendlydesc: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  access: R
+- id: r6c_timestamp_byte_4
+  name: Timestamp byte 4
+  registers:
+  - 0x6C
+  operation: read
+  assembly: single
+  encoding: ascii
+  mask: 0xFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 23; cross-checked with supplied Markdown
+  note: ""
+  description: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  friendlydesc: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  access: R
+- id: r6d_timestamp_byte_5
+  name: Timestamp byte 5
+  registers:
+  - 0x6D
+  operation: read
+  assembly: single
+  encoding: ascii
+  mask: 0xFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 23; cross-checked with supplied Markdown
+  note: ""
+  description: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  friendlydesc: Timestamp ASCII byte; not a live clock or a verified revision identifier.
+  access: R
+- id: r39_ic_version
+  name: IC version
+  registers:
+  - 0x39
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "1": B
+    "2": C
+    "3": D
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 20; cross-checked with supplied Markdown
+  note: ""
+  description: 'Device revision code: 1=B, 2=C, 3=D; other codes are not specified.'
+  friendlydesc: 'Device revision code: 1=B, 2=C, 3=D; other codes are not specified.'
+  access: R
+- id: r77_ntc_excitation_current
+  name: NTC excitation current
+  registers:
+  - 0x77
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 60
+  offset: 20
+  unit: uA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 24; cross-checked with supplied Markdown
+  note: ""
+  description: 'NTC bias current: bit 7=0 selects 20 uA; bit 7=1 selects 80 uA.'
+  friendlydesc: 'NTC bias current: bit 7=0 selects 20 uA; bit 7=1 selects 80 uA.'
+  access: R
+  atomic_step: 0
+  atomic_step_basis: Display step in declared units; not ADC resolution or a calibration guarantee.
+- id: r50_battery_voltage_code
+  name: Battery voltage
+  registers:
+  - 0x50
+  - 0x51
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 21; cross-checked with supplied Markdown
+  note: ""
+  description: VBAT = raw mV.
+  friendlydesc: VBAT = raw mV.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or measurement accuracy.
+- id: r52_system_voltage_code
+  name: System voltage
+  registers:
+  - 0x52
+  - 0x53
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 21; cross-checked with supplied Markdown
+  note: ""
+  description: VSYS = raw mV.
+  friendlydesc: VSYS = raw mV.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or measurement accuracy.
+- id: r54_usb_c_mos_current_code
+  name: USB-C MOS current
+  registers:
+  - 0x54
+  - 0x55
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: unsigned_code_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 21-22; cross-checked with supplied Markdown
+  note: Unsigned combined code scaled to mA; physical current direction/sign not established. Conversion assumes approximately 10 mOhm internal MOS resistance; actual calibration needs validation.
+  description: Port current = raw mA; assumes about 10 mOhm internal MOS resistance.
+  friendlydesc: Port current = raw mA; assumes about 10 mOhm internal MOS resistance.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or measurement accuracy.
+- id: r56_usb_a_mos_current_code
+  name: USB-A MOS current
+  registers:
+  - 0x56
+  - 0x57
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: unsigned_code_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 22; cross-checked with supplied Markdown
+  note: Unsigned combined code scaled to mA; physical current direction/sign not established. Conversion assumes approximately 10 mOhm internal MOS resistance; actual calibration needs validation.
+  description: Port current = raw mA; assumes about 10 mOhm internal MOS resistance.
+  friendlydesc: Port current = raw mA; assumes about 10 mOhm internal MOS resistance.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or measurement accuracy.
+- id: r6e_battery_current_code
+  name: Battery current
+  registers:
+  - 0x6E
+  - 0x6F
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: unsigned_code_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 23; cross-checked with supplied Markdown
+  note: Unsigned combined code scaled to mA; physical current direction/sign not established.
+  description: Battery current = raw mA. Physical signedness is not established.
+  friendlydesc: Battery current = raw mA. Physical signedness is not established.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or measurement accuracy.
+- id: r70_system_current_code
+  name: System current
+  registers:
+  - 0x70
+  - 0x71
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: unsigned_code_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 23-24; cross-checked with supplied Markdown
+  note: Unsigned combined code scaled to mA; physical current direction/sign not established.
+  description: System current = raw mA. Physical signedness is not established.
+  friendlydesc: System current = raw mA. Physical signedness is not established.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display step in declared units; not ADC resolution or measurement accuracy.
+- id: r74_system_power_code
+  name: System power
+  registers:
+  - 0x74
+  - 0x75
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 10
+  offset: 0
+  unit: mW
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 24; cross-checked with supplied Markdown
+  note: ""
+  description: System power = raw x 10 mW.
+  friendlydesc: System power = raw x 10 mW.
+  access: R
+  atomic_step: 1000
+  atomic_step_basis: Display step in declared units; not ADC resolution or measurement accuracy.
+- id: r78_ntc_voltage_code
+  name: NTC voltage
+  registers:
+  - 0x78
+  - 0x79
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 3300
+  evidence: IP2369_AC Register Description Document V1.10, 2025-07-23, pages 24-25; cross-checked with supplied Markdown
+  note: ""
+  description: NTC/GPIO0 voltage = raw mV, 0..3300 mV; no temperature conversion.
+  friendlydesc: NTC/GPIO0 voltage = raw mV, 0..3300 mV; no temperature conversion.
+  access: R
+  atomic_step: 10
+  atomic_step_basis: Display step in declared units; not ADC resolution or measurement accuracy.

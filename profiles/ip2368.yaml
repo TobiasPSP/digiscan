@@ -1,0 +1,2297 @@
+schema_version: 1
+device:
+  id: ip2368
+  name: IP2368 v1.0
+  profile_revision: 1
+  typical_addresses:
+  - 117
+  address: 117
+  register_address_bytes: 1
+filter_lists:
+  - name: USB Direction
+    registers: [0x0B, 0x31, 0x33, 0x34, 0x38]
+reports:
+  - header: All
+    groups:
+      - header: null
+        items: [All]
+  - header: Battery
+    groups:
+      - header: Overview
+        items: [0x50_1111111111111111, 0x6E_1111111111111111, 0x03_01111111]
+identification:
+  - register: 0x04
+    mask: 0x7F
+    min: 0
+    max: 127
+    class: C
+    source: IP2368 V1.61 p6; bits 6:0 FCAP = N * 200 mAh, bit 7 is enable
+    label: Capacity code; all seven-bit codes compatible, not distinguishing
+graphs:
+  - header: Battery
+    lines:
+      - property: 0x50_1111111111111111
+        min: 0
+        max: 30000
+        color: 0x60D4E3
+        area: false
+      - property: 0x6E_1111111111111111
+        min: 0
+        max: 10000
+        color: 0xFFCD70
+        area: false
+provenance:
+  reference_url: ""
+  manual: IP2368 register description V1.61, 2022-07-13, 21 pages
+  manual_sha256: A04327A4B396D3B416549AA105CAFB4C8F02143A36D0C015275DF359461577DC
+  scope: IP2368_I2C_COUT and IP2368_I2C_NACT only (page 3)
+  derived: 2026-10-09
+  baseline: User-supplied translated original manual; no assumed equivalence with IP2366/IP2369. Unresolved translation and context dependencies remain explicit.
+transport:
+  passive_only: false
+  active_read:
+    protocol: single_byte_pointer_restart
+    clock_Hz: 10000
+    max_registers: 3
+policy:
+  assembly: Consecutive low-first target reads, per address; tablet maximum group arrival gap 1 s
+  physical_units: Documented conversion once into mV, mA, mW, mAh, uA or percent. Context-dependent settings retain codes or chemistry-qualified choices.
+properties:
+- id: r00_loadotp
+  name: Reset defaults on wake
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 4
+  note: ""
+  description: When 1, restores register defaults after power-on/wake.
+  friendlydesc: When 1, restores register defaults after power-on/wake.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, restores register defaults after power-on/wake.
+- id: r00_resetmcu
+  name: Reset request
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 4
+  note: ""
+  description: Writing 1 requests a reset; the bit clears automatically.
+  friendlydesc: Writing 1 requests a reset; the bit clears automatically.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: Writing 1 requests a reset; the bit clears automatically.
+- id: r00_int_low
+  name: Fault interrupt
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 4
+  note: ""
+  description: When 1, faults pull INT low for 2 ms.
+  friendlydesc: When 1, faults pull INT low for 2 ms.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, faults pull INT low for 2 ms.
+- id: r00_sink_dpdm
+  name: Input DP/DM
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 4
+  note: ""
+  description: When 1, enables input DP/DM fast charging.
+  friendlydesc: When 1, enables input DP/DM fast charging.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, enables input DP/DM fast charging.
+- id: r00_sink_pd
+  name: Input PD
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 4
+  note: ""
+  description: When 1, enables input USB PD.
+  friendlydesc: When 1, enables input USB PD.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, enables input USB PD.
+- id: r00_sink_scp
+  name: Input SCP
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 4
+  note: ""
+  description: When 1, enables input SCP fast charging.
+  friendlydesc: When 1, enables input SCP fast charging.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, enables input SCP fast charging.
+- id: r00_sink_mos
+  name: Input MOS enable
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 4
+  note: ""
+  description: When 1, permits the USB-C input MOS path.
+  friendlydesc: When 1, permits the USB-C input MOS path.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, permits the USB-C input MOS path.
+- id: r00_charger
+  name: Charging enable
+  registers:
+  - 0x00
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x1
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 4
+  note: ""
+  description: When 1, permits battery charging.
+  friendlydesc: When 1, permits battery charging.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, permits battery charging.
+- id: r01_batmode_enable
+  name: Battery type override
+  registers:
+  - 0x01
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 4
+  note: ""
+  description: When 1, permits battery-type selection via bit 2.
+  friendlydesc: When 1, permits battery-type selection via bit 2.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, permits battery-type selection via bit 2.
+- id: r01_batmode
+  name: Battery type
+  registers:
+  - 0x01
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": LiFePO4
+    "1": Ordinary lithium
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 5
+  note: ""
+  description: ""
+  friendlydesc: Selects battery chemistry; voltage thresholds depend on this setting.
+  access: R/W
+- id: r01_isetmode_enable
+  name: Current mode override
+  registers:
+  - 0x01
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 5
+  note: ""
+  description: When 1, permits current/power mode selection via bit 0.
+  friendlydesc: When 1, permits current/power mode selection via bit 0.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, permits current/power mode selection via bit 0.
+- id: r01_isetmode
+  name: Charge setting mode
+  registers:
+  - 0x01
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x1
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Battery current
+    "1": Input power
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 5
+  note: ""
+  description: ""
+  friendlydesc: Configured charge setting mode.
+  access: R/W
+- id: r02_vset_enable
+  name: Voltage override
+  registers:
+  - 0x02
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 5
+  note: ""
+  description: When 1, permits the full-charge voltage setting.
+  friendlydesc: When 1, permits the full-charge voltage setting.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, permits the full-charge voltage setting.
+- id: r02_vset
+  name: Cell target (mode-dependent)
+  registers:
+  - 0x02
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x7F
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 127
+  evidence: IP2368 register description V1.61 (2022-07-13), page 5
+  note: Do not assume chemistry from reset defaults or the related IP2366/IP2369 chips.
+  description: '0x01 bit 2=0: 3500 + 10*code mV (maximum 3700). Bit 2=1: 4000 + 10*code mV (maximum 4400).'
+  friendlydesc: Cell target voltage depends on battery type. The field code is shown until cross-register context decoding is supported.
+  access: R/W
+- id: r03_iset_enable
+  name: Charge limit override
+  registers:
+  - 0x03
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 5
+  note: ""
+  description: When 1, permits the charging-current or power setting.
+  friendlydesc: When 1, permits the charging-current or power setting.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, permits the charging-current or power setting.
+- id: r03_iset
+  name: Charge limit (mode-dependent)
+  registers:
+  - 0x03
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x7F
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 127
+  evidence: IP2368 register description V1.61 (2022-07-13), page 5
+  note: Requires 0x01 bit 0 context; no single unit is safe for both modes.
+  description: '0x01 bit 0=0: 100*code mA (maximum 5000 mA). Bit 0=1: code W (maximum 100 W).'
+  friendlydesc: This code sets battery current or input power, depending on charge mode.
+  access: R/W
+- id: r04_fcap_enable
+  name: Capacity override
+  registers:
+  - 0x04
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 6
+  note: ""
+  description: When 1, permits configured battery capacity.
+  friendlydesc: When 1, permits configured battery capacity.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, permits configured battery capacity.
+- id: r04_fcap
+  name: Configured capacity
+  registers:
+  - 0x04
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x7F
+  shift: 0
+  scale: 200
+  offset: 0
+  unit: mAh
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 127
+  evidence: IP2368 register description V1.61 (2022-07-13), page 6
+  note: ""
+  description: ""
+  friendlydesc: Configured configured capacity.
+  access: R/W
+  atomic_step: 200
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r06_cap_now
+  name: Current capacity code
+  registers:
+  - 0x06
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 255
+  evidence: IP2368 register description V1.61 (2022-07-13), page 6
+  note: The manual specifies Cap_Now=N but does not explicitly state a unit. Not assumed to be percent from its name.
+  description: ""
+  friendlydesc: Configured current capacity code.
+  access: R/W
+- id: r07_itk
+  name: Trickle current
+  registers:
+  - 0x07
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xF0
+  shift: 4
+  scale: 50
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 8
+  evidence: IP2368 register description V1.61 (2022-07-13), page 6
+  note: ""
+  description: ""
+  friendlydesc: Configured trickle current.
+  access: R/W
+  atomic_step: 50
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r07_trickle_threshold
+  name: Trickle threshold (mode-dependent)
+  registers:
+  - 0x07
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xC
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": LiFePO4 2300 / lithium 2800 mV
+    "1": LiFePO4 2400 / lithium 2900 mV
+    "2": LiFePO4 2500 / lithium 3000 mV
+    "3": LiFePO4 2600 / lithium 3100 mV
+  valid_min: 0
+  valid_max: 3
+  evidence: IP2368 register description V1.61 (2022-07-13), page 6
+  note: ""
+  description: Per-cell threshold selected using battery type in 0x01 bit 2.
+  friendlydesc: Per-cell threshold selected using battery type in 0x01 bit 2.
+  access: R/W
+- id: r07_charge_timeout
+  name: Charge timeout
+  registers:
+  - 0x07
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x3
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Disabled
+    "1": 24 h
+    "2": 36 h
+    "3": 48 h
+  valid_min: 0
+  valid_max: 3
+  evidence: IP2368 register description V1.61 (2022-07-13), page 6
+  note: ""
+  description: ""
+  friendlydesc: Configured charge timeout.
+  access: R/W
+- id: r08_istop
+  name: Termination current
+  registers:
+  - 0x08
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xF0
+  shift: 4
+  scale: 50
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 15
+  evidence: IP2368 register description V1.61 (2022-07-13), page 7
+  note: ""
+  description: ""
+  friendlydesc: Configured termination current.
+  access: R/W
+  atomic_step: 50
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r08_recharge
+  name: Recharge threshold
+  registers:
+  - 0x08
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xC
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Disabled
+    "1": 50 mV/cell below target
+    "2": 100 mV/cell below target
+    "3": 200 mV/cell below target
+  valid_min: 0
+  valid_max: 3
+  evidence: IP2368 register description V1.61 (2022-07-13), page 7
+  note: ""
+  description: ""
+  friendlydesc: Configured recharge threshold.
+  access: R/W
+- id: r09_standby
+  name: Standby enable
+  registers:
+  - 0x09
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 7
+  note: ""
+  description: When 1, enables standby.
+  friendlydesc: When 1, enables standby.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, enables standby.
+- id: r09_batlow_override
+  name: Undervoltage override
+  registers:
+  - 0x09
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 7
+  note: ""
+  description: When 1, permits battery-low threshold setting in 0x0A.
+  friendlydesc: When 1, permits battery-low threshold setting in 0x0A.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, permits battery-low threshold setting in 0x0A.
+- id: r09_batlow_disable
+  name: Low-voltage shutdown control
+  registers:
+  - 0x09
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Code 0 (polarity unclear)
+    "1": Code 1 (polarity unclear)
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 7
+  note: Translated heading says turn off shutdown, while codes say enable/disable. Shutdown polarity is not resolved.
+  description: ""
+  friendlydesc: Configured low-voltage shutdown control.
+  access: R/W
+- id: r0a_batlow
+  name: Undervoltage threshold (mode-dependent)
+  registers:
+  - 0x0A
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xE0
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": LiFePO4 2300 / lithium 2800 mV
+    "1": LiFePO4 2400 / lithium 2900 mV
+    "2": LiFePO4 2500 / lithium 3000 mV
+    "3": LiFePO4 2600 / lithium 3100 mV
+    "4": LiFePO4 2700 / lithium 3200 mV
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2368 register description V1.61 (2022-07-13), page 7
+  note: ""
+  description: Per-cell threshold; pack threshold multiplies by series-cell count. Chemistry from 0x01 bit 2.
+  friendlydesc: Per-cell threshold; pack threshold multiplies by series-cell count. Chemistry from 0x01 bit 2.
+  access: R/W
+- id: r0b_output
+  name: Output enable
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 8
+  note: ""
+  description: When 1, enables discharge output.
+  friendlydesc: When 1, enables discharge output.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, enables discharge output.
+- id: r0b_src_dpdm
+  name: Output DP/DM
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 8
+  note: ""
+  description: When 1, enables output DP/DM fast charging.
+  friendlydesc: When 1, enables output DP/DM fast charging.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, enables output DP/DM fast charging.
+- id: r0b_src_pd
+  name: Output PD
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 8
+  note: ""
+  description: When 1, enables output USB PD.
+  friendlydesc: When 1, enables output USB PD.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, enables output USB PD.
+- id: r0b_src_scp
+  name: Output SCP
+  registers:
+  - 0x0B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 8
+  note: ""
+  description: When 1, enables output SCP fast charging.
+  friendlydesc: When 1, enables output SCP fast charging.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, enables output SCP fast charging.
+- id: r0c_src_power
+  name: Maximum output power
+  registers:
+  - 0x0C
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xE0
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 20 W
+    "1": 25 W
+    "2": 30 W
+    "3": 45 W
+    "4": 60 W
+    "5": 100 W
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2368 register description V1.61 (2022-07-13), page 8
+  note: 100 W requires the documented cable-identification circuit; a selected code does not prove available output power.
+  description: ""
+  friendlydesc: Configured maximum output power.
+  access: R/W
+- id: r22_role
+  name: USB-C role
+  registers:
+  - 0x22
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xC0
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": UFP
+    "1": DFP
+    "3": DRP
+  valid_min: 0
+  valid_max: 3
+  evidence: IP2368 register description V1.61 (2022-07-13), page 8
+  note: ""
+  description: ""
+  friendlydesc: Configured usb-c role.
+  access: R/W
+- id: r23_5v_current
+  name: 5 V PDO current selector
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 2400 mA
+    "1": 3000 mA
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 9
+  note: ""
+  description: ""
+  friendlydesc: Configured 5 v pdo current selector.
+  access: R/W
+- id: r23_pps2_iset_enable
+  name: PPS2 PDO current override
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 9
+  note: ""
+  description: Enabled PDO current settings also define overcurrent at 1.1 times configured current.
+  friendlydesc: When 1, applies the corresponding configured PDO current limit.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, applies the corresponding configured PDO current limit.
+- id: r23_pps1_iset_enable
+  name: PPS1 PDO current override
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 9
+  note: ""
+  description: Enabled PDO current settings also define overcurrent at 1.1 times configured current.
+  friendlydesc: When 1, applies the corresponding configured PDO current limit.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, applies the corresponding configured PDO current limit.
+- id: r23_20v_iset_enable
+  name: 20V PDO current override
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 9
+  note: ""
+  description: Enabled PDO current settings also define overcurrent at 1.1 times configured current.
+  friendlydesc: When 1, applies the corresponding configured PDO current limit.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, applies the corresponding configured PDO current limit.
+- id: r23_15v_iset_enable
+  name: 15V PDO current override
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 9
+  note: ""
+  description: Enabled PDO current settings also define overcurrent at 1.1 times configured current.
+  friendlydesc: When 1, applies the corresponding configured PDO current limit.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, applies the corresponding configured PDO current limit.
+- id: r23_12v_iset_enable
+  name: 12V PDO current override
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 9
+  note: ""
+  description: Enabled PDO current settings also define overcurrent at 1.1 times configured current.
+  friendlydesc: When 1, applies the corresponding configured PDO current limit.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, applies the corresponding configured PDO current limit.
+- id: r23_9v_iset_enable
+  name: 9V PDO current override
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 9
+  note: ""
+  description: Enabled PDO current settings also define overcurrent at 1.1 times configured current.
+  friendlydesc: When 1, applies the corresponding configured PDO current limit.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, applies the corresponding configured PDO current limit.
+- id: r23_5v_iset_enable
+  name: 5V PDO current override
+  registers:
+  - 0x23
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x1
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 9
+  note: ""
+  description: When 1, applies the corresponding configured PDO current limit.
+  friendlydesc: When 1, applies the corresponding configured PDO current limit.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, applies the corresponding configured PDO current limit.
+- id: r24_pdo_current
+  name: 5 V PDO current
+  registers:
+  - 0x24
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 150
+  evidence: IP2368 register description V1.61 (2022-07-13), page 10
+  note: ""
+  description: ""
+  friendlydesc: Configured advertised current, not a measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r25_pdo_current
+  name: 9 V PDO current
+  registers:
+  - 0x25
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 150
+  evidence: IP2368 register description V1.61 (2022-07-13), page 10
+  note: ""
+  description: ""
+  friendlydesc: Configured advertised current, not a measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r26_pdo_current
+  name: 12 V PDO current
+  registers:
+  - 0x26
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 150
+  evidence: IP2368 register description V1.61 (2022-07-13), page 10
+  note: ""
+  description: ""
+  friendlydesc: Configured advertised current, not a measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r27_pdo_current
+  name: 15 V PDO current
+  registers:
+  - 0x27
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 150
+  evidence: IP2368 register description V1.61 (2022-07-13), page 10
+  note: ""
+  description: ""
+  friendlydesc: Configured advertised current, not a measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r28_pdo_current
+  name: 20 V PDO current
+  registers:
+  - 0x28
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 20
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 250
+  evidence: IP2368 register description V1.61 (2022-07-13), page 10
+  note: Above 3 A requires e-mark identification. PPS default text says 5 A but reset 0x3C converts to 3 A; reset is not used to infer live values.
+  description: ""
+  friendlydesc: Configured advertised current, not a measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r29_pdo_current
+  name: PPS1 PDO current
+  registers:
+  - 0x29
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 50
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 100
+  evidence: IP2368 register description V1.61 (2022-07-13), page 11
+  note: Above 3 A requires e-mark identification. PPS default text says 5 A but reset 0x3C converts to 3 A; reset is not used to infer live values.
+  description: ""
+  friendlydesc: Configured advertised current, not a measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r2a_pdo_current
+  name: PPS2 PDO current
+  registers:
+  - 0x2A
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 50
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 100
+  evidence: IP2368 register description V1.61 (2022-07-13), page 11
+  note: Above 3 A requires e-mark identification. PPS default text says 5 A but reset 0x3C converts to 3 A; reset is not used to infer live values.
+  description: ""
+  friendlydesc: Configured advertised current, not a measured current.
+  access: R/W
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r2b_pps2_enable
+  name: PPS2 PDO enable
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 11
+  note: ""
+  description: When 1, advertises this output PDO.
+  friendlydesc: When 1, advertises this output PDO.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, advertises this output PDO.
+- id: r2b_pps1_enable
+  name: PPS1 PDO enable
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 11
+  note: ""
+  description: When 1, advertises this output PDO.
+  friendlydesc: When 1, advertises this output PDO.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, advertises this output PDO.
+- id: r2b_20v_enable
+  name: 20V PDO enable
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 11
+  note: ""
+  description: When 1, advertises this output PDO.
+  friendlydesc: When 1, advertises this output PDO.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, advertises this output PDO.
+- id: r2b_15v_enable
+  name: 15V PDO enable
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 11
+  note: ""
+  description: When 1, advertises this output PDO.
+  friendlydesc: When 1, advertises this output PDO.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, advertises this output PDO.
+- id: r2b_12v_enable
+  name: 12V PDO enable
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 11
+  note: ""
+  description: When 1, advertises this output PDO.
+  friendlydesc: When 1, advertises this output PDO.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, advertises this output PDO.
+- id: r2b_9v_enable
+  name: 9V PDO enable
+  registers:
+  - 0x2B
+  operation: read_write
+  assembly: single
+  encoding: uint
+  mask: 0x2
+  shift: 1
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 11
+  note: ""
+  description: When 1, advertises this output PDO.
+  friendlydesc: When 1, advertises this output PDO.
+  access: R/W
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, advertises this output PDO.
+- id: r30_soc
+  name: State of charge
+  registers:
+  - 0x30
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0xFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: '%'
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 100
+  evidence: IP2368 register description V1.61 (2022-07-13), page 13
+  note: ""
+  description: ""
+  friendlydesc: Chip-reported battery percentage, not an independent capacity measurement.
+  access: R
+  atomic_step: 1
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r31_charging
+  name: Charging
+  registers:
+  - 0x31
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 13
+  note: ""
+  description: When 1, reports charging state.
+  friendlydesc: When 1, reports charging state.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports charging state.
+- id: r31_full
+  name: Charging complete
+  registers:
+  - 0x31
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 13
+  note: ""
+  description: When 1, reports a full-charge state.
+  friendlydesc: When 1, reports a full-charge state.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports a full-charge state.
+- id: r31_output
+  name: Discharging
+  registers:
+  - 0x31
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 13
+  note: ""
+  description: When 1, reports discharge output enabled without abnormality.
+  friendlydesc: When 1, reports discharge output enabled without abnormality.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports discharge output enabled without abnormality.
+- id: r31_state
+  name: Charging state
+  registers:
+  - 0x31
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x7
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": Standby
+    "1": Trickle
+    "2": Constant current
+    "3": Constant voltage
+    "4": Waiting for charging
+    "5": Full
+    "6": Timeout
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2368 register description V1.61 (2022-07-13), page 13
+  note: ""
+  description: ""
+  friendlydesc: Chip-reported charging state.
+  access: R
+- id: r32_input_mode
+  name: Charging input mode
+  registers:
+  - 0x32
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0xC0
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "0": 5 V input
+    "1": High-voltage input
+  valid_min: 0
+  valid_max: 3
+  evidence: IP2368 register description V1.61 (2022-07-13), page 13
+  note: ""
+  description: ""
+  friendlydesc: Chip-reported charging input mode.
+  access: R
+- id: r33_vbus_ok
+  name: Input powered
+  registers:
+  - 0x33
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 14
+  note: ""
+  description: When 1, reports VBUS input power present.
+  friendlydesc: When 1, reports VBUS input power present.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports VBUS input power present.
+- id: r33_vbus_ov
+  name: Input overvoltage
+  registers:
+  - 0x33
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 14
+  note: ""
+  description: When 1, reports VBUS input overvoltage.
+  friendlydesc: When 1, reports VBUS input overvoltage.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports VBUS input overvoltage.
+- id: r33_charge_voltage
+  name: Charging voltage
+  registers:
+  - 0x33
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x7
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum:
+    "2": 5 V
+    "3": 7 V
+    "4": 9 V
+    "5": 12 V
+    "6": 15 V
+    "7": 20 V
+  valid_min: 0
+  valid_max: 7
+  evidence: IP2368 register description V1.61 (2022-07-13), page 14
+  note: ""
+  description: ""
+  friendlydesc: Chip-reported charging voltage.
+  access: R
+- id: r34_sink
+  name: USB-C input connected
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 14
+  note: ""
+  description: When 1, reports usb-c input connected.
+  friendlydesc: When 1, reports usb-c input connected.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports usb-c input connected.
+- id: r34_source
+  name: USB-C output connected
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 14
+  note: ""
+  description: When 1, reports usb-c output connected.
+  friendlydesc: When 1, reports usb-c output connected.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports usb-c output connected.
+- id: r34_source_pd
+  name: Output PD valid
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 14
+  note: ""
+  description: When 1, reports output pd valid.
+  friendlydesc: When 1, reports output pd valid.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports output pd valid.
+- id: r34_sink_pd
+  name: Input PD valid
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 14
+  note: ""
+  description: When 1, reports input pd valid.
+  friendlydesc: When 1, reports input pd valid.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports input pd valid.
+- id: r34_sink_qc
+  name: Input QC valid
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x8
+  shift: 3
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 14
+  note: Translated QC/5 V qualification is unclear; do not infer successful high-voltage negotiation from this flag alone.
+  description: When 1, reports input qc valid.
+  friendlydesc: When 1, reports input qc valid.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports input qc valid.
+- id: r34_source_qc
+  name: Output QC valid
+  registers:
+  - 0x34
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x4
+  shift: 2
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 14
+  note: Translated QC/5 V qualification is unclear; do not infer successful high-voltage negotiation from this flag alone.
+  description: When 1, reports output qc valid.
+  friendlydesc: When 1, reports output qc valid.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports output qc valid.
+- id: r35_input_mos
+  name: Input MOS on
+  registers:
+  - 0x35
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x40
+  shift: 6
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 15
+  note: ""
+  description: When 1, reports the VBUS input MOS on.
+  friendlydesc: When 1, reports the VBUS input MOS on.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports the VBUS input MOS on.
+- id: r38_overcurrent
+  name: System overcurrent
+  registers:
+  - 0x38
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x20
+  shift: 5
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 15
+  note: Description says write 1 to clear, but access table says R; active writes are not enabled.
+  description: When 1, reports system overcurrent triggered.
+  friendlydesc: When 1, reports system overcurrent triggered.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports system overcurrent triggered.
+- id: r38_short
+  name: System short circuit
+  registers:
+  - 0x38
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x10
+  shift: 4
+  scale: 1
+  offset: 0
+  unit: code
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 15
+  note: Description says write 1 to clear, but access table says R; active writes are not enabled.
+  description: When 1, reports system short circuit triggered.
+  friendlydesc: When 1, reports system short circuit triggered.
+  access: R
+  bit_meanings:
+    "0":
+      status: "NO"
+      interpretation: Not asserted / disabled
+    "1":
+      status: "YES"
+      interpretation: When 1, reports system short circuit triggered.
+- id: r50_battery_voltage
+  name: Battery voltage
+  registers:
+  - 0x50
+  - 0x51
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2368 register description V1.61 (2022-07-13), page 16
+  note: ""
+  description: Battery voltage = combined low-first code in mV.
+  friendlydesc: Battery voltage = combined low-first code in mV.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r52_system_voltage
+  name: System voltage
+  registers:
+  - 0x52
+  - 0x53
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2368 register description V1.61 (2022-07-13), page 16
+  note: ""
+  description: System voltage = combined low-first code in mV.
+  friendlydesc: System voltage = combined low-first code in mV.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r54_input_current
+  name: Input current
+  registers:
+  - 0x54
+  - 0x55
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: unsigned_code_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2368 register description V1.61 (2022-07-13), page 16
+  note: Unsigned code in mA; the manual does not establish signed encoding.
+  description: Input current = combined low-first code in mA.
+  friendlydesc: Input current = combined low-first code in mA.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r56_output_current
+  name: Output current
+  registers:
+  - 0x56
+  - 0x57
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: unsigned_code_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2368 register description V1.61 (2022-07-13), page 17
+  note: Unsigned code in mA; the manual does not establish signed encoding. Page 17 incorrectly calls 0x31 bit 5 a discharge flag, contradicting the charging flag table; no such dependency is applied.
+  description: Output current = combined low-first code in mA.
+  friendlydesc: Output current = combined low-first code in mA.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r6e_battery_current
+  name: Battery current
+  registers:
+  - 0x6E
+  - 0x6F
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: unsigned_code_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2368 register description V1.61 (2022-07-13), page 17
+  note: Unsigned code in mA; the manual does not establish signed encoding.
+  description: Battery current = combined low-first code in mA.
+  friendlydesc: Battery current = combined low-first code in mA.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r70_system_current
+  name: System current
+  registers:
+  - 0x70
+  - 0x71
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: unsigned_code_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 65535
+  evidence: IP2368 register description V1.61 (2022-07-13), page 17
+  note: Unsigned code in mA; the manual does not establish signed encoding.
+  description: System current = combined low-first code in mA.
+  friendlydesc: System current = combined low-first code in mA.
+  access: R
+  atomic_step: 100
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r74_system_power
+  name: System power
+  registers:
+  - 0x74
+  - 0x75
+  - 0x76
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mW
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 16777215
+  evidence: IP2368 register description V1.61 (2022-07-13), page 18
+  note: V1.61 adds 0x76 as bits 23:16. Requires all three bytes; unlike IP2369, the scale is 1 mW/code.
+  description: System power = combined low-first code in mW.
+  friendlydesc: System power = combined low-first code in mW.
+  access: R
+  atomic_step: 1000
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r77_ntc_bias
+  name: NTC excitation current
+  registers:
+  - 0x77
+  operation: read
+  assembly: single
+  encoding: uint
+  mask: 0x80
+  shift: 7
+  scale: 60
+  offset: 20
+  unit: uA
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 1
+  evidence: IP2368 register description V1.61 (2022-07-13), page 18
+  note: ""
+  description: ""
+  friendlydesc: Chip-reported ntc excitation current.
+  access: R
+  atomic_step: 0
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r78_ntc_voltage
+  name: NTC voltage
+  registers:
+  - 0x78
+  - 0x79
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 3300
+  evidence: IP2368 register description V1.61 (2022-07-13), page 19
+  note: No temperature conversion without verified thermistor and divider data.
+  description: NTC voltage = combined low-first code in mV.
+  friendlydesc: Analog pin voltage, not the configured quantity or a decoded temperature.
+  access: R
+  atomic_step: 10
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r7a_iset_voltage
+  name: Iset pin voltage
+  registers:
+  - 0x7A
+  - 0x7B
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 3300
+  evidence: IP2368 register description V1.61 (2022-07-13), page 19
+  note: ""
+  description: Iset pin voltage = combined low-first code in mV.
+  friendlydesc: Analog pin voltage, not the configured quantity or a decoded temperature.
+  access: R
+  atomic_step: 10
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r7c_vset_voltage
+  name: Vset pin voltage
+  registers:
+  - 0x7C
+  - 0x7D
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 3300
+  evidence: IP2368 register description V1.61 (2022-07-13), page 19
+  note: ""
+  description: Vset pin voltage = combined low-first code in mV.
+  friendlydesc: Analog pin voltage, not the configured quantity or a decoded temperature.
+  access: R
+  atomic_step: 10
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r7e_fcap_voltage
+  name: Capacity pin voltage
+  registers:
+  - 0x7E
+  - 0x7F
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 3300
+  evidence: IP2368 register description V1.61 (2022-07-13), page 20
+  note: ""
+  description: Capacity pin voltage = combined low-first code in mV.
+  friendlydesc: Analog pin voltage, not the configured quantity or a decoded temperature.
+  access: R
+  atomic_step: 10
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
+- id: r80_batnum_voltage
+  name: Cell-count pin voltage
+  registers:
+  - 0x80
+  - 0x81
+  operation: read
+  assembly: consecutive_target_reads
+  encoding: uint_le
+  mask: 0xFFFF
+  shift: 0
+  scale: 1
+  offset: 0
+  unit: mV
+  precision: 0
+  enum: {}
+  valid_min: 0
+  valid_max: 3300
+  evidence: IP2368 register description V1.61 (2022-07-13), page 20
+  note: Page 20 labels GPIO4 but repeats the GPIO3 formula. Identical voltage scaling is provisional; the copy-paste discrepancy remains recorded.
+  description: Cell-count pin voltage = combined low-first code in mV.
+  friendlydesc: Analog pin voltage, not the configured quantity or a decoded temperature.
+  access: R
+  atomic_step: 10
+  atomic_step_basis: Display hysteresis step in declared units, not measurement resolution or accuracy.
