@@ -4,28 +4,54 @@
 
 I2C MONITOR is an instrument for observing, understanding, diagnosing and experimenting with I2C devices. In many cases, this device can completely replace expensive oscilloscopes and complex signal analyzers.
 
+It consists of two parts:
+
+* **I2C Sniffer:**     
+  A simple RP2040 or RP2350 performs the wire tapping and only requires a few wires and no extra components. When you connect it to a PC via its USB-C connector, you can use [PowerShell scripts](tools\I2CMonitor) to display its readings, filter, parse, and much more.    
+* **ESP32-S3 Tablet Front-End:**   
+  For portable use, add a *Guition ESP32-S3 3.5" tablet* and connect it to the UART interface of the Raspberry. This setup runs without PC stand-alone. The tablet has built-in battery support.
+
+To sniff and experiment, connect the Raspberry I2C interface to your I2C device that you want to test.
+
+This is what the full setup looks like:
+
+<img src="docs/images/sniffer1.webp" width="50%" height="50%" />
+
+The tablet is fully optional. Without the tablet, use your PC and the provided PowerShell scripts.
+
 ### Signal Acquisition
 
-A headless RP2350 captures the bus and acts as a passive I2C sniffer. It can also actively write the bus.
+A headless RP2350 captures the bus and acts as a **passive** I2C sniffer: it uses high-impedance inputs and does not interfere with the I2C bus under test, much similar to how an oscilloscope or signal analyzer work. 
+
+It can also actively write the bus. Make sure you add pullup resistors yourself if you want to work with isolated I2C components that do not yet have their own I2C master.
 
 
 ### Monitoring
 Monitoring is passive by default; scans, requested reads, writes and playback are explicit active operations that are performed with careful collision detection to minimize interference with existing I2C masters.
 
 ### Parsing
-Raw transactions can be parsed and translated into discoverable text via profile files.
+By default, the sniffer provides you with the I2C transactions. By adding editable chip profiles, these transactions can be automatically translated into meaningful text.
+
+<img src="docs/images/sniffer2.webp" width="80%" height="80%" />
+
 
 The project comes with profile files for IP2366, IP2368, and IP2369. Editable chip profiles make the instrument extensible without rebuilding its firmware.
 
+## Firmware
+
+Full source code is provided in the folder [sourcecode](sourcecode). 
+
+For the Raspberry, [compiled firmware](firmware) is available for RP2350 and RP2040. Note that RP2350 and RP2040 use different GPIO assignments for the I2C sniffer cable and UART.
+
+
+## Software
+* If you use a ESP32-S3 tablet via UART, no additional software is required. The complete software part is integrated into the [tablet firmware](sourcecode\Tablet).
+
+* If you use the Raspberry stand-alone, use the provided PowerShell scripts in [tools](tools).
+  
 ### PC Software
 
 The RP2350 can be controlled from a PC via UART-Serial and i.e. PowerShell scripts. Uploading new custom profiles is supported.
-
-### Stand-Alone Operation
-The RP2350 features a high-speed 2MBaud UART connector that can be used by a microcontroller to connect.
-
-In this project, I used an affordable 3.5" Guition ESP32-S3 tablet and created firmware for it. The tablet then handles decoding, touch controls and visualization, turning the device into a fully portable solution that no longer requires a PC.
-
 
 
 
@@ -51,17 +77,6 @@ In this project, I used an affordable 3.5" Guition ESP32-S3 tablet and created f
 
 - **Diagnostics and session management:** Diagnostics expose bus timing estimates, capture faults, UART health, queues and reported losses. New Session clears temporary investigation data, while Reset Configuration also clears saved assignments/settings without deleting installed chip profiles.
 
-## V22 Acquisition Refinements
-
-Use the matching RP2350 V13 firmware for accelerated Reports and Graph reads. Both now share bounded property-read batches: synchronization is retained across the batch, while every byte still requires bus-idle admission and physical pin release. Arbitration loss, interference, uncertain restoration and timeouts stop the batch. No automatic read retries, extra pull-ups or faster I2C clock are used.
-
-GRAPH's footer contains an acquisition-mode button, a 1-30 second interval, a trash icon that clears only graph history, and START/STOP. The trash icon preserves property selections, interval, mode and running/paused state. START explicitly enables acknowledged capture/delivery for passive acquisition; STOP freezes the graph and cancels pending graph reads without stopping other consumers' passive monitoring. Graphs still start paused after a reboot.
-
-- **Passive:** plot captured values; no active reads. The interval dropdown is disabled because acquisition follows observed bus traffic. Tap the mode button to choose Passive/Active or Active and enable the interval dropdown.
-- **Passive/Active:** at each interval, read only selected properties lacking a successful passive observation younger than that interval. Active replies do not count as fresh passive observations.
-- **Active:** read all selected properties at each interval. Shared register fields are read once per cycle; their values update all corresponding fields.
-
-The interval is measured from completion of a read cycle, preventing overlapping requests. The chart's 10 Hz presentation grid remains independent of acquisition. Manual Setup now selects properties only; acquisition controls remain visible in the footer. With older RP firmware, the existing individual-read path remains available, but lacks the batch speed improvement.
 
 ## Parts List
 
@@ -78,6 +93,8 @@ The interval is measured from completion of a read cycle, preventing overlapping
 The tablet is a separate frontend, not the bus sampler. An SD card, Wi-Fi connection, USB/UART adapter and external TFT are not required.
 
 ### Choose The Correct RP2350 Silicon
+
+Generally, it is recommended to use a RP2350 over a RP2040 because the RP2350 provdies more headroom, both in speed and memory. However, if you opt for a RP2350, make sure you use a **recent hardware revision**. The initial RP2350 MCUs had a hardware flaw that can affect this project. 
 
 Use an **A4-stepping** board for this build, with the chip marked **RP2350B0A4**. Early **A2** silicon has GPIO erratum RP2350-E9: input pads can exhibit unwanted leakage instead of behaving as clean high-impedance probes. That is particularly undesirable on a passive I2C instrument. A4 fixes E9, although it does not eliminate every RP2350 erratum. Ask the seller for a photo of the actual chip marking and inspect the delivered part; a listing saying only "RP2350B" or "new version" is not sufficient. The **B** identifies the 48-GPIO package variant, not the silicon stepping; the final **A4** is what to check. This wiring/binary requires that B-package board because it uses GP30/31. See Raspberry Pi's [A4 announcement and marking guidance](https://www.raspberrypi.com/news/rp2350-a4-rp2354-and-a-new-hacking-challenge/).
 
@@ -153,6 +170,19 @@ Reports collect profile-defined properties passively. Unseen values stay empty; 
 Choose a predefined graph or Manual and select parsed properties. The footer cycles Passive, Passive/Active and Active acquisition, with a 1-30 second interval. START/STOP controls graph acquisition and plotting; the trash icon clears history. Graphs reboot paused. Property units come from profiles; normalization is presentation, not conversion.
 
 ![Graph footer controls, simulated](docs/images/graph-v22.png)
+
+
+#### V22 Acquisition Refinements
+
+Use the matching RP2350/RP2040 V13 firmware for accelerated Reports and Graph reads. Both now share bounded property-read batches: synchronization is retained across the batch, while every byte still requires bus-idle admission and physical pin release. Arbitration loss, interference, uncertain restoration and timeouts stop the batch. No automatic read retries, extra pull-ups or faster I2C clock are used.
+
+GRAPH's footer contains an acquisition-mode button, a 1-30 second interval, a trash icon that clears only graph history, and START/STOP. The trash icon preserves property selections, interval, mode and running/paused state. START explicitly enables acknowledged capture/delivery for passive acquisition; STOP freezes the graph and cancels pending graph reads without stopping other consumers' passive monitoring. Graphs still start paused after a reboot.
+
+- **Passive:** plot captured values; no active reads. The interval dropdown is disabled because acquisition follows observed bus traffic. Tap the mode button to choose Passive/Active or Active and enable the interval dropdown.
+- **Passive/Active:** at each interval, read only selected properties lacking a successful passive observation younger than that interval. Active replies do not count as fresh passive observations.
+- **Active:** read all selected properties at each interval. Shared register fields are read once per cycle; their values update all corresponding fields.
+
+The interval is measured from completion of a read cycle, preventing overlapping requests. The chart's 10 Hz presentation grid remains independent of acquisition. Manual Setup now selects properties only; acquisition controls remain visible in the footer. With older RP firmware, the existing individual-read path remains available, but lacks the batch speed improvement.
 
 ### Recorder
 
