@@ -4,6 +4,9 @@
 
 I2C MONITOR is an instrument for observing, understanding, diagnosing and experimenting with I2C devices. In many cases, this device can completely replace expensive oscilloscopes and complex signal analyzers.
 
+
+<img src="docs/images/sniffer1.webp" width="50%" height="50%" />
+
 It consists of two parts:
 
 * **I2C Sniffer:**     
@@ -13,9 +16,7 @@ It consists of two parts:
 
 To sniff and experiment, connect the Raspberry I2C interface to your I2C device that you want to test.
 
-This is what the full setup looks like:
 
-<img src="docs/images/sniffer1.webp" width="50%" height="50%" />
 
 The tablet is fully optional. Without the tablet, use your PC and the provided PowerShell scripts.
 
