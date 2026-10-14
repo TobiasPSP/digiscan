@@ -1,0 +1,3294 @@
+schema_version: 1
+device:
+  id: ip2366
+  name: IP2366 v1.0
+  profile_revision: 2
+  typical_addresses: [0x75]
+  address: 0x75
+  register_address_bytes: 1
+filter_lists:
+  - name: USB Direction
+    registers: [0x0B, 0x31, 0x33, 0x34, 0x38]
+reports:
+  - header: All
+    groups:
+      - header: null
+        items: [All]
+  - header: Battery
+    groups:
+      - header: Overview
+        items: [0x50_1111111111111111, 0x6E_1111111111111111, 0x03_11111111]
+identification:
+  - register: 0x04
+    mask: 0x07
+    min: 2
+    max: 6
+    class: C
+    source: IP2366 DUT cell-count validation; not an exclusive or mandatory silicon signature
+    label: Direct cell-count range, DUT verified, shared with IP2369
+graphs:
+  - header: Battery
+    lines:
+      - property: 0x50_1111111111111111
+        min: 0
+        max: 30000
+        color: 0x60D4E3
+        area: false
+      - property: 0x6E_1111111111111111
+        min: 0
+        max: 10000
+        color: 0xFFCD70
+        area: false
+provenance:
+  reference_path: C:\github\doneland_sources\Components\Power\Power Supplies\Battery\Chargers\Charge-Discharge\IP2366\I2C Reference\README.md
+  reference_url: https://done.land/components/power/powersupplies/battery/chargers/charge-discharge/ip2366/i2creference/
+  reference_sha256: 6A845E1B001E56EAAB75B64AA875638607234A5ED0A0D9CEE2824ED7DDD4A7C1
+  derived: 2026-10-09
+  baseline: User reference; A cross-check; uncertainties preserved
+  amendment: 2026-10-09 independently verified DUT measurements and settings; corrected PDO readback; documented and experimental evidence distinguished
+transport:
+  voltage_V: 3.3
+  max_clock_kHz: 250
+  address_write: 0xEA
+  address_read: 0xEB
+  passive_only: false
+  active_read:
+    protocol: single_byte_pointer_restart
+    clock_Hz: 10000
+    max_registers: 3
+policy:
+  multi_byte_reads: not_assumed_to_auto_increment
+  assembly: consecutive target transactions, low then high, each exactly one successful byte
+  timing: no capture timestamps; ordering is not a timing guarantee
+register_reference:
+  - section: System and charging controls
+    registers:
+      - 0x00
+    source_cells:
+      - '`0x00`'
+      - SYS_CTL0 / En_LOADOTP
+      - "7"
+      - R/W
+      - 1 reloads defaults on boot/wake; 0 retains settings through that mechanism. Manual discourages clearing without suitable reinitialization logic.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x00
+    source_cells:
+      - '`0x00`'
+      - En_RESETMCU
+      - "6"
+      - R/W
+      - Write 1 to reset registers to defaults; self-clears. Wait 2 s per A.
+      - "0"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x00
+    source_cells:
+      - '`0x00`'
+      - En_INT_low
+      - "5"
+      - R/W
+      - 1 enables an approximately 2 ms low INT exception indication.
+      - "0"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x00
+    source_cells:
+      - '`0x00`'
+      - En_Vbus_SinkDPdM
+      - "4"
+      - R/W
+      - Input DP/DM fast-charge negotiation enable.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x00
+    source_cells:
+      - '`0x00`'
+      - En_Vbus_SinkPd
+      - "3"
+      - R/W
+      - Input PD negotiation enable.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x00
+    source_cells:
+      - '`0x00`'
+      - En_Vbus_SinkSCP
+      - "2"
+      - R/W
+      - Input SCP negotiation enable.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x00
+    source_cells:
+      - '`0x00`'
+      - Reserved
+      - "1"
+      - Preserve
+      - No usable definition.
+      - "0"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x00
+    source_cells:
+      - '`0x00`'
+      - En_Charger
+      - "0"
+      - R/W
+      - 1 enables charging; 0 disables charging. B's translated parenthesis is awkward; A clearly describes no charging when disabled.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x01
+    source_cells:
+      - '`0x01`'
+      - SYS_CTL1
+      - Unknown
+      - Unknown
+      - D labels it series-cell count, battery type, current-setting mode. No bit allocation or coding established.
+      - Unknown
+      - D lead only
+  - section: System and charging controls
+    registers:
+      - 0x02
+    source_cells:
+      - '`0x02`'
+      - SYS_CTL2 / Vset
+      - 7:0
+      - R/W
+      - Per-cell target `2500 + 10k` mV; maximum 4400 mV, so documented useful codes 0–190. Pack target nominally `S × Vcell`.
+      - Unspecified
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x03
+    source_cells:
+      - '`0x03`'
+      - SYS_CTL3 / Iset
+      - 7:0
+      - R/W
+      - BAT-side charging-current limit `100k` mA; documented maximum 9700 mA. Must not be below termination current.
+      - '`0x61` = 9700 mA'
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x04
+    source_cells:
+      - '`0x04`'
+      - SYS_CTL4 / Bat_Num
+      - 2:0
+      - R/W (inferred)
+      - Series-cell count, inferred direct coding `k = S`, proposed range 2-6. A 4S battery returned byte `0x04`, supporting code 4 = 4 cells. Other codes and write behavior have not been validated.
+      - Unknown
+      - User bench observation, 2026-10-07; similar-chip inference
+  - section: System and charging controls
+    registers:
+      - 0x04
+    source_cells:
+      - '`0x04`'
+      - Reserved
+      - 7:3
+      - --
+      - Preserve these bits; no meaning assigned. Reserved allocation is inferred, not manufacturer-confirmed for this variant.
+      - Unknown
+      - Similar-chip inference
+  - section: System and charging controls
+    registers:
+      - 0x06
+    source_cells:
+      - '`0x06`'
+      - SYS_CTL6 / Itk
+      - 7:0
+      - R/W
+      - Precharge/trickle current `50k` mA. No independent trickle threshold or timeout field exposed here in the inspected PDFs.
+      - '`0x04` = 200 mA'
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x08
+    source_cells:
+      - '`0x08`'
+      - SYS_CTL8 / Istop
+      - 7:4
+      - R/W
+      - Termination current `50k` mA; field 0–15 gives 0–750 mA. **Zero is not documented as “disable termination.”**
+      - 2 = 100 mA
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x08
+    source_cells:
+      - '`0x08`'
+      - Vrch
+      - 3:2
+      - R/W
+      - 0 no recharge; 1 target − `S×50 mV`; 2 target − `S×100 mV`; 3 target − `S×200 mV`.
+      - "2"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x08
+    source_cells:
+      - '`0x08`'
+      - Reserved
+      - 1:0
+      - Preserve
+      - No usable definition.
+      - Unspecified
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x09
+    source_cells:
+      - '`0x09`'
+      - SYS_CTL9 / En_Standby
+      - "7"
+      - R/W
+      - 1 permits standby; 0 disables it.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x09
+    source_cells:
+      - '`0x09`'
+      - Standby
+      - "6"
+      - R/W
+      - One-shot write 1 enters standby when not charging; requires bit 7 enabled.
+      - "0"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x09
+    source_cells:
+      - '`0x09`'
+      - En_BAT_Low
+      - "5"
+      - R/W
+      - Enable fixed 5 V pack low-voltage shutdown; software protection only; also changes precharge-to-CC behavior.
+      - "0"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x0A
+    source_cells:
+      - '`0x0A`'
+      - SYS_CTL10 / Set_BATlow
+      - 7:5
+      - R/W
+      - '**A:** 0–4 = 2.8/2.9/3.0/3.1/3.2 V per cell; 5–7 unspecified. **B:** 0–7 = 2.5 through 3.2 V per cell in 0.1 V increments. Also affects precharge-to-CC threshold. B says ≤2.7 V has software-only low-voltage protection.'
+      - 2, meaning differs
+      - Conflicting A/B
+  - section: System and charging controls
+    registers:
+      - 0x0B
+    source_cells:
+      - '`0x0B`'
+      - SYS_CTL11 / En_Dc-Dc_Output
+      - "7"
+      - R/W
+      - 1 enables discharge output; 0 disables it.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x0B
+    source_cells:
+      - '`0x0B`'
+      - En_Vbus_Src_DP_dM
+      - "6"
+      - R/W
+      - Output DP/DM fast-charge enable.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x0B
+    source_cells:
+      - '`0x0B`'
+      - En_Vbus_SrcPd
+      - "5"
+      - R/W
+      - Output PD enable.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x0B
+    source_cells:
+      - '`0x0B`'
+      - En_Vbus_SrcSCP
+      - "4"
+      - R/W
+      - Output SCP enable.
+      - "1"
+      - A/B
+  - section: System and charging controls
+    registers:
+      - 0x0C
+    source_cells:
+      - '`0x0C`'
+      - SYS_CTL12 / Vbus_Src_Power
+      - 7:5
+      - R/W
+      - 'Codes 0/1/2/3/4/5 = 30/45/60/65/100/140 W. Codes 6/7 undefined. A calls it input/output selection; B calls it output. A says writes interact with PDO settings: later writes override earlier ones.'
+      - 5 = 140 W
+      - A/B, scope wording differs
+  - section: System and charging controls
+    registers:
+      - 0x0D
+    source_cells:
+      - '`0x0D`'
+      - SELECT_PDO / Pdo_select
+      - 2:0
+      - 'R; write access disputed'
+      - 'N V1.14 defines input fixed PDO selection: 0 automatic, 1/2/3/4/5 = 5/9/12/15/20 V; 6/7 undefined. B has a conflicting codebook. Check availability in `0x35` first. Read access documented; write access disputed.'
+      - Unspecified
+      - B/N; codebook and access contradictions
+  - section: System and charging controls
+    registers:
+      - 0x17
+    source_cells:
+      - '`0x17`'
+      - NTC_CTL / NTC_EN
+      - "7"
+      - R/W (inferred)
+      - 1 enables battery NTC temperature protection; 0 disables it. Similar-chip inference with user-reported passive validation; write behavior not experimentally established.
+      - Unknown
+      - User report, 2026-10-07
+  - section: System and charging controls
+    registers:
+      - 0x17
+    source_cells:
+      - '`0x17`'
+      - Reserved
+      - 6:0
+      - --
+      - Preserve; no assigned meaning. Allocation inferred from similar-chip documentation.
+      - Unknown
+      - Similar-chip inference
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x22
+    source_cells:
+      - '`0x22`'
+      - TypeC_CTL8 / Vbus_Mode_Set
+      - 7:6
+      - R/W
+      - 0 UFP/sink; 1 DFP/source; 3 DRP; 2 undefined.
+      - 'A: 3; B: 0'
+      - A/B default conflict
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x23
+    source_cells:
+      - '`0x23`'
+      - TypeC_CTL9 / En_5VPdo_3A/2.4A
+      - "7"
+      - R/W
+      - 'Default 5 V PDO current choice: 1 = 3 A; 0 = 2.4 A. Interaction with custom-current enable needs validation.'
+      - "1"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x23
+    source_cells:
+      - '`0x23`'
+      - En_Pps2Pdo_Iset
+      - "6"
+      - R/W
+      - Enable custom PPS2 current from `0x2A`.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x23
+    source_cells:
+      - '`0x23`'
+      - En_Pps1Pdo_Iset
+      - "5"
+      - R/W
+      - Enable custom PPS1 current from `0x29`.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x23
+    source_cells:
+      - '`0x23`'
+      - En_20VPdo_Iset
+      - "4"
+      - R/W
+      - Enable custom 20 V current from `0x28`.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x23
+    source_cells:
+      - '`0x23`'
+      - En_15VPdo_Iset
+      - "3"
+      - R/W
+      - Enable custom 15 V current from `0x27`.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x23
+    source_cells:
+      - '`0x23`'
+      - En_12VPdo_Iset
+      - "2"
+      - R/W
+      - Enable custom 12 V current from `0x26`.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x23
+    source_cells:
+      - '`0x23`'
+      - En_9VPdo_Iset
+      - "1"
+      - R/W
+      - Enable custom 9 V current from `0x25`.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x23
+    source_cells:
+      - '`0x23`'
+      - En_5VPdo_Iset
+      - "0"
+      - R/W
+      - Enable custom 5 V current from `0x24`.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x24
+    source_cells:
+      - '`0x24`'
+      - TypeC_CTL10 / 5VPdo_Iset
+      - 7:0
+      - R/W
+      - Source 5 V advertised current `20k` mA, plus add bit from `0x2C[0]`. B states maximum 3 A.
+      - '`0x96` = 3 A'
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x25
+    source_cells:
+      - '`0x25`'
+      - TypeC_CTL11 / 9VPdo_Iset
+      - 7:0
+      - R/W
+      - Source 9 V current `20k` mA, plus `0x2C[1]`. B maximum 3 A.
+      - '`0x96`'
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x26
+    source_cells:
+      - '`0x26`'
+      - TypeC_CTL12 / 12VPdo_Iset
+      - 7:0
+      - R/W
+      - Source 12 V current `20k` mA, plus `0x2C[2]`. B maximum 3 A.
+      - '`0x96`'
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x27
+    source_cells:
+      - '`0x27`'
+      - TypeC_CTL13 / 15VPdo_Iset
+      - 7:0
+      - R/W
+      - Source 15 V current `20k` mA, plus `0x2C[3]`. B maximum 3 A.
+      - '`0x96`'
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x28
+    source_cells:
+      - '`0x28`'
+      - TypeC_CTL14 / 20VPdo_Iset
+      - 7:0
+      - R/W
+      - Source 20 V current `20k` mA, plus `0x2C[4]`. B maximum 5 A with cable recognition, otherwise 3 A.
+      - '`0xFA` = 5 A'
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x29
+    source_cells:
+      - '`0x29`'
+      - TypeC_CTL23 / Pps1Pdo_Iset
+      - 7:0
+      - R/W
+      - PPS1 source advertised current `50k` mA. B discusses up to 5 A with cable recognition, otherwise 3 A, but its default prose contradicts field value.
+      - '`0x3C` = **3 A**, not 5 A'
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2A
+    source_cells:
+      - '`0x2A`'
+      - TypeC_CTL24 / Pps2Pdo_Iset
+      - 7:0
+      - R/W
+      - PPS2 source current `50k` mA; same caveat as PPS1.
+      - '`0x3C` = **3 A**'
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2B
+    source_cells:
+      - '`0x2B`'
+      - TypeC_CTL17 / En_Src_Pps2Pdo
+      - "6"
+      - R/W
+      - Advertise PPS2 when 1.
+      - "1"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2B
+    source_cells:
+      - '`0x2B`'
+      - En_Src_Pps1Pdo
+      - "5"
+      - R/W
+      - Advertise PPS1 when 1.
+      - "1"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2B
+    source_cells:
+      - '`0x2B`'
+      - En_Src_20VPdo
+      - "4"
+      - R/W
+      - Advertise fixed 20 V when 1.
+      - "1"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2B
+    source_cells:
+      - '`0x2B`'
+      - En_Src_15VPdo
+      - "3"
+      - R/W
+      - Advertise fixed 15 V when 1.
+      - "1"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2B
+    source_cells:
+      - '`0x2B`'
+      - En_Src_12VPdo
+      - "2"
+      - R/W
+      - Advertise fixed 12 V when 1.
+      - "1"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2B
+    source_cells:
+      - '`0x2B`'
+      - En_Src_9VPdo
+      - "1"
+      - R/W
+      - Advertise fixed 9 V when 1. Bits 7 and 0 are reserved.
+      - "1"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2C
+    source_cells:
+      - '`0x2C`'
+      - TypeC_CTL18 / EN_20VPDO_ADD
+      - "4"
+      - R/W
+      - Add 10 mA to programmed 20 V PDO current.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2C
+    source_cells:
+      - '`0x2C`'
+      - EN_15VPDO_ADD
+      - "3"
+      - R/W
+      - Add 10 mA to 15 V PDO current.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2C
+    source_cells:
+      - '`0x2C`'
+      - EN_12VPDO_ADD
+      - "2"
+      - R/W
+      - Add 10 mA to 12 V PDO current.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2C
+    source_cells:
+      - '`0x2C`'
+      - EN_9VPDO_ADD
+      - "1"
+      - R/W
+      - Add 10 mA to 9 V PDO current.
+      - "0"
+      - A/B
+  - section: USB-C role and source PDO controls
+    registers:
+      - 0x2C
+    source_cells:
+      - '`0x2C`'
+      - EN_5VPDO_ADD
+      - "0"
+      - R/W
+      - Add 10 mA to 5 V PDO current.
+      - "0"
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x31
+    source_cells:
+      - '`0x31`'
+      - STATE_CTL0 / CHG_En
+      - "5"
+      - R
+      - Charging-context flag; VbusOk counts. Does not prove nonzero BAT current.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x31
+    source_cells:
+      - '`0x31`'
+      - CHG_End
+      - "4"
+      - R
+      - 1 indicates full/charge complete.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x31
+    source_cells:
+      - '`0x31`'
+      - Output_En
+      - "3"
+      - R
+      - 1 discharge output open without reported abnormality.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x31
+    source_cells:
+      - '`0x31`'
+      - Chg_state
+      - 2:0
+      - R
+      - 0 standby; 1 trickle; 2 CC; 3 CV; 4 waiting; 5 full; 6 timeout; 7 undefined.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x32
+    source_cells:
+      - '`0x32`'
+      - STATE_CTL1 / Chg_State
+      - 7:6
+      - R
+      - 0 = 5 V input charging; 1 = high-voltage fast charging. Other codes unspecified.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x33
+    source_cells:
+      - '`0x33`'
+      - STATE_CTL2 / Vbus_Ok
+      - "7"
+      - R
+      - VBUS powered/present.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x33
+    source_cells:
+      - '`0x33`'
+      - Vbus_Ov
+      - "6"
+      - R
+      - VBUS input overvoltage flag.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x33
+    source_cells:
+      - '`0x33`'
+      - Chg_Vbus
+      - 2:0
+      - R
+      - Input-voltage category; conflicting codebooks below.
+      - A/B conflict
+  - section: Status and partner capabilities
+    registers:
+      - 0x34
+    source_cells:
+      - '`0x34`'
+      - TypeC_STATE / Sink_Ok
+      - "7"
+      - R
+      - Valid Type-C sink connection.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x34
+    source_cells:
+      - '`0x34`'
+      - Src_Ok
+      - "6"
+      - R
+      - Valid Type-C source connection.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x34
+    source_cells:
+      - '`0x34`'
+      - Src_Pd_Ok
+      - "5"
+      - R
+      - Source-side PD connection valid.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x34
+    source_cells:
+      - '`0x34`'
+      - Sink_Pd_Ok
+      - "4"
+      - R
+      - Sink-side PD connection valid.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x34
+    source_cells:
+      - '`0x34`'
+      - Vbus_Sink_Qc_Ok
+      - "3"
+      - R
+      - Input fast-charge flag; QC5V/PD5V excluded from fast-charge indication.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x34
+    source_cells:
+      - '`0x34`'
+      - Vbus_Src_Qc_Ok
+      - "2"
+      - R
+      - Output fast-charge flag; QC5V/PD5V excluded.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x35
+    source_cells:
+      - '`0x35`'
+      - RECEIVED_PDO / PDO_20V
+      - "4"
+      - R
+      - Received/available fixed 20 V PDO flag. No current value.
+      - B only + C
+  - section: Status and partner capabilities
+    registers:
+      - 0x35
+    source_cells:
+      - '`0x35`'
+      - PDO_15V
+      - "3"
+      - R
+      - Fixed 15 V received/available.
+      - B only + C
+  - section: Status and partner capabilities
+    registers:
+      - 0x35
+    source_cells:
+      - '`0x35`'
+      - PDO_12V
+      - "2"
+      - R
+      - Fixed 12 V received/available.
+      - B only + C
+  - section: Status and partner capabilities
+    registers:
+      - 0x35
+    source_cells:
+      - '`0x35`'
+      - PDO_9V
+      - "1"
+      - R
+      - Fixed 9 V received/available.
+      - B only + C
+  - section: Status and partner capabilities
+    registers:
+      - 0x35
+    source_cells:
+      - '`0x35`'
+      - PDO_5V
+      - "0"
+      - R
+      - Fixed 5 V received/available. Bits 7:5 reserved.
+      - B only + C
+  - section: Status and partner capabilities
+    registers:
+      - 0x38
+    source_cells:
+      - '`0x38`'
+      - STATE_CTL3 / Vsys_Oc
+      - "5"
+      - R / W1C?
+      - Latched output overcurrent; prose says write 1 to clear despite R column.
+      - A/B inconsistency
+  - section: Status and partner capabilities
+    registers:
+      - 0x38
+    source_cells:
+      - '`0x38`'
+      - Vsys_Scdt
+      - "4"
+      - R / W1C?
+      - Latched output short-circuit; same access inconsistency.
+      - A/B
+  - section: Status and partner capabilities
+    registers:
+      - 0x3A
+    source_cells:
+      - '`0x3A`'
+      - IC_TEMP / Thermal_loop
+      - "7"
+      - R (inferred)
+      - 1 indicates thermal loop active; 0 inactive. Not the external battery NTC temperature or its enable setting.
+      - Similar-chip inference; user observed bit 7 = 0, 2026-10-07
+  - section: Status and partner capabilities
+    registers:
+      - 0x3A
+    source_cells:
+      - '`0x3A`'
+      - IC_TEMP
+      - 6:0
+      - R (inferred)
+      - 'Inferred unsigned direct temperature in degrees Celsius: `temperature_degC = byte & 0x7F`. User observed `0x1E`, interpreted as 30 degrees Celsius.'
+      - User passive capture; plausible room/light-load result, not independent calibration
+  - section: Measurements and identification bytes
+    registers:
+      - 0x50
+      - 0x51
+    source_cells:
+      - '`0x50`, `0x51`'
+      - BATVADC_DAT0/1
+      - R
+      - Low then high; combined value in mV at VBAT.
+      - A/B
+  - section: Measurements and identification bytes
+    registers:
+      - 0x52
+      - 0x53
+    source_cells:
+      - '`0x52`, `0x53`'
+      - VsysVADC_DAT0/1
+      - R
+      - Low then high; combined value in mV at VSYS.
+      - A/B; confirm actual board node and voltage drop to USB VBUS.
+  - section: Measurements and identification bytes
+    registers:
+      - 0x69
+    source_cells:
+      - '`0x69`'
+      - TIMENODE1
+      - R
+      - First ASCII identification/time-node character.
+      - B only + C
+  - section: Measurements and identification bytes
+    registers:
+      - 0x6A
+    source_cells:
+      - '`0x6A`'
+      - TIMENODE2
+      - R
+      - Second ASCII character.
+      - B only + C
+  - section: Measurements and identification bytes
+    registers:
+      - 0x6B
+    source_cells:
+      - '`0x6B`'
+      - TIMENODE3
+      - R
+      - Third ASCII character.
+      - B only + C
+  - section: Measurements and identification bytes
+    registers:
+      - 0x6C
+    source_cells:
+      - '`0x6C`'
+      - TIMENODE4
+      - R
+      - Fourth ASCII character.
+      - B only + C
+  - section: Measurements and identification bytes
+    registers:
+      - 0x6D
+    source_cells:
+      - '`0x6D`'
+      - TIMENODE5
+      - R
+      - Fifth ASCII character.
+      - B only + C; not established as a live clock or formal version ID.
+  - section: Measurements and identification bytes
+    registers:
+      - 0x6E
+      - 0x6F
+    source_cells:
+      - '`0x6E`, `0x6F`'
+      - IBATIADC_DAT0/1
+      - R
+      - Low then high; combined BAT current in mA.
+      - A/B; signedness/direction coding not specified.
+  - section: Measurements and identification bytes
+    registers:
+      - 0x70
+      - 0x71
+    source_cells:
+      - '`0x70`, `0x71`'
+      - ISYS_IADC_DAT0 / IVsys_IADC_DAT1
+      - R
+      - Low then high; combined system-side current in mA.
+      - A/B; inconsistent naming; signedness not specified.
+  - section: Measurements and identification bytes
+    registers:
+      - 0x74
+      - 0x75
+    source_cells:
+      - '`0x74`, `0x75`'
+      - Vsys_POW_DAT0/1
+      - R?
+      - A gives combined power in 10 mW units.
+      - B mistranslates battery level as power in the revision history. Chinese V1.14 confirms the removed feature is battery-level reading, not power telemetry. A gives 10 mW units; validate on the actual chip.
+  - section: Measurements and identification bytes
+    registers:
+      - 0x77
+    source_cells:
+      - '`0x77`'
+      - INTC_IADC_DAT0 / NTC_IADC_DAT
+      - R
+      - 'Bit 7: 0 = 20 µA excitation; 1 = 80 µA. Bits 6:0 reserved.'
+      - A/B; this is an excitation-current indication, not battery current.
+  - section: Measurements and identification bytes
+    registers:
+      - 0x78
+      - 0x79
+    source_cells:
+      - '`0x78`, `0x79`'
+      - VGPIO0_NTC_DAT0/1
+      - R
+      - Low then high; GPIO0/NTC voltage in mV, nominal 0–3300 mV.
+      - A/B; no additional 3300/65535 scaling is specified.
+  - section: Undocumented or questionable address leads
+    registers:
+      - 0x01
+    source_cells:
+      - '`0x01`'
+      - 'SYS_CTL1: series count, battery type, current-setting mode'
+      - Bits, encoding, access, prerequisites, reset behavior, firmware applicability. Unused definition; matches an IP2368 heading. No verified cell-count field.
+      - D
+  - section: Undocumented or questionable address leads
+    registers:
+      - 0x04
+    source_cells:
+      - '`0x04`'
+      - Earlier SYS_CTL4 battery-capacity lead
+      - Superseded as the working interpretation by the inferred Bat_Num field above and the 4S/code-4 bench observation. C's capacity label remains an unverified conflicting lead; variant applicability is unresolved.
+      - C; user observation 2026-10-07
+  - section: Undocumented or questionable address leads
+    registers:
+      - 0x54
+    source_cells:
+      - '`0x54`'
+      - 'IVBUS_IADC: input charging current'
+      - Width, scale, access, relevance; absent from A/B.
+      - D
+  - section: Undocumented or questionable address leads
+    registers:
+      - 0x7A
+    source_cells:
+      - '`0x7A`'
+      - 'VGPIO1_ISET: current setting'
+      - May be configuration-pin ADC data rather than writable current command. GPIO1 is INT in standard IP2366 I²C pinout, raising concern.
+      - D
+  - section: Undocumented or questionable address leads
+    registers:
+      - 0x7C
+    source_cells:
+      - '`0x7C`'
+      - 'VGPIO2_VSET: cell-voltage setting'
+      - Access and scale unknown; may be GPIO voltage telemetry.
+      - D
+  - section: Undocumented or questionable address leads
+    registers:
+      - 0x7E
+    source_cells:
+      - '`0x7E`'
+      - 'VGPIO3_FCAP: battery capacity'
+      - Conflicts with usual IP2366 GPIO3/PSET function.
+      - D
+  - section: Undocumented or questionable address leads
+    registers:
+      - 0x80
+    source_cells:
+      - '`0x80`'
+      - 'VGPIO4_BATNUM: cell-count setting'
+      - No bit definition; name is consistent with BAT_NUM pin but does not prove writable S. Do not infer codes 2–6.
+      - D
+properties:
+  - id: r00_en_loadotp
+    friendlydesc: "When 1, default settings are reloaded at startup or wake; when 0, settings are retained."
+    name: En_LOADOTP
+    registers:
+      - 0x00
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x80
+    shift: 7
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: 1 reloads defaults on boot/wake; 0 retains settings through that mechanism. Manual discourages clearing without suitable reinitialization logic.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: No default-register reload at boot/wake
+      "1":
+        status: "YES"
+        interpretation: Default-register reload at boot/wake enabled
+  - id: r00_en_resetmcu
+    friendlydesc: "Writing 1 requests default-register restoration; the bit then clears itself. Zero does not confirm completion."
+    name: En_RESETMCU
+    registers:
+      - 0x00
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x40
+    shift: 6
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Write 1 to reset registers to defaults; self-clears. Wait 2 s per A.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: No reset request asserted; does not prove completion
+      "1":
+        status: "YES"
+        interpretation: Reset-to-defaults request; self-clears; wait 2 s after reset
+  - id: r00_en_int_low
+    friendlydesc: "When 1, exceptions can trigger a brief low pulse on INT to notify the controller."
+    name: En_INT_low
+    registers:
+      - 0x00
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x20
+    shift: 5
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: 1 enables an approximately 2 ms low INT exception indication.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Exception indication disabled
+      "1":
+        status: "YES"
+        interpretation: Approximately 2 ms low INT exception indication enabled
+  - id: r00_en_vbus_sinkdpdm
+    friendlydesc: "When 1, input fast-charge negotiation over USB data pins is permitted."
+    name: En_Vbus_SinkDPdM
+    registers:
+      - 0x00
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x10
+    shift: 4
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Input DP/DM fast-charge negotiation enable.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Input DP/DM fast-charge negotiation disabled
+      "1":
+        status: "YES"
+        interpretation: Input DP/DM fast-charge negotiation enabled
+  - id: r00_en_vbus_sinkpd
+    friendlydesc: "When 1, USB Power Delivery negotiation for receiving power is permitted."
+    name: En_Vbus_SinkPd
+    registers:
+      - 0x00
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x08
+    shift: 3
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Input PD negotiation enable.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Input PD negotiation disabled
+      "1":
+        status: "YES"
+        interpretation: Input PD negotiation enabled
+  - id: r00_en_vbus_sinkscp
+    friendlydesc: "When 1, SCP fast-charge negotiation for receiving power is permitted."
+    name: En_Vbus_SinkSCP
+    registers:
+      - 0x00
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x04
+    shift: 2
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Input SCP negotiation enable.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Input SCP negotiation disabled
+      "1":
+        status: "YES"
+        interpretation: Input SCP negotiation enabled
+  - id: r00_en_charger
+    friendlydesc: "When 1, charging is permitted; other conditions can still prevent current flow."
+    name: En_Charger
+    registers:
+      - 0x00
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x01
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: 1 enables charging; 0 disables charging. B's translated parenthesis is awkward; A clearly describes no charging when disabled.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Charging disabled
+      "1":
+        status: "YES"
+        interpretation: Charging enabled; not proof of current flow
+  - id: r02_vset
+    friendlydesc: "Charging target per cell, not per pack. Pack target also depends on series-cell count."
+    name: Cell charge target
+    registers:
+      - 0x02
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 10
+    offset: 2500
+    unit: mV
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 190
+    evidence: A/B
+    note: ""
+    description: Per-cell target `2500 + 10k` mV; maximum 4400 mV, so documented useful codes 0â€“190. Pack target nominally `S Ã— Vcell`.
+    access: R/W
+  - id: r03_iset
+    friendlydesc: "Battery-side charging-current limit, not measured current. Must not be below termination current."
+    name: BAT charge current limit
+    registers:
+      - 0x03
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 100
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 97
+    evidence: A/B
+    note: ""
+    description: BAT-side charging-current limit `100k` mA; documented maximum 9700 mA. Must not be below termination current.
+    access: R/W
+  - id: r06_itk
+    friendlydesc: "Current setting for precharge or trickle charging."
+    name: Precharge current
+    registers:
+      - 0x06
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 50
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 2
+    valid_max: 20
+    evidence: A/B/N 50 mA per code; N minimum 100 mA; DUT range verified 2026-10-09
+    note: Working IP2366 range 100-1000 mA adopted from DUT settings; 0x04 = 200 mA and 0x14 = 1000 mA verified. Upper limit is experimental evidence, not specified in the supplied manuals.
+    description: Precharge/trickle current 50 times code in mA; supported working range 100-1000 mA in 50 mA steps (codes 0x02-0x14).
+    access: R/W
+  - id: r08_istop
+    friendlydesc: "Current threshold for ending a charge. Zero is not documented as disabling termination."
+    name: Termination current
+    registers:
+      - 0x08
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xF0
+    shift: 4
+    scale: 50
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 15
+    evidence: A/B
+    note: ""
+    description: "Termination current `50k` mA; field 0â€“15 gives 0â€“750 mA. **Zero is not documented as â€œdisable termination.â€\x9D**"
+    access: R/W
+  - id: r08_vrch
+    friendlydesc: "Voltage drop below the charge target that permits recharging; zero disables recharging."
+    name: Vrch
+    registers:
+      - 0x08
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x0C
+    shift: 2
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum:
+      "0": no recharge
+      "1": target minus S * 50 mV
+      "2": target minus S * 100 mV
+      "3": target minus S * 200 mV
+    valid_min: 0
+    valid_max: 3
+    evidence: A/B
+    note: S is not inferred; no pack voltage calculated.
+    description: 0 no recharge; 1 target âˆ’ `SÃ—50 mV`; 2 target âˆ’ `SÃ—100 mV`; 3 target âˆ’ `SÃ—200 mV`.
+    access: R/W
+  - id: r09_en_standby
+    friendlydesc: "When 1, standby entry is permitted. This does not report the current standby state."
+    name: En_Standby
+    registers:
+      - 0x09
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x80
+    shift: 7
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: 1 permits standby; 0 disables it.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Standby entry disabled
+      "1":
+        status: "YES"
+        interpretation: Standby entry permitted
+  - id: r09_standby
+    friendlydesc: "Writing 1 requests standby once, if standby is enabled and charging is inactive."
+    name: Standby
+    registers:
+      - 0x09
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x40
+    shift: 6
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: One-shot write 1 enters standby when not charging; requires bit 7 enabled.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Normal standby workflow
+      "1":
+        status: "YES"
+        interpretation: One-shot standby request; requires bit 7 and non-charging state
+  - id: r09_en_bat_low
+    friendlydesc: "When 1, fixed 5 V pack shutdown is enabled. Software protection only; also affects precharge transition."
+    name: En_BAT_Low
+    registers:
+      - 0x09
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x20
+    shift: 5
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Enable fixed 5 V pack low-voltage shutdown; software protection only; also changes precharge-to-CC behavior.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Fixed 5 V low-battery shutdown disabled
+      "1":
+        status: "YES"
+        interpretation: Fixed 5 V software shutdown enabled; precharge threshold also changes
+  - id: r0a_set_batlow
+    friendlydesc: "Battery low-voltage threshold per cell; also affects the precharge-to-constant-current transition."
+    name: Set_BATlow
+    registers:
+      - 0x0A
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xE0
+    shift: 5
+    scale: 100
+    offset: 2500
+    unit: mV
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 7
+    evidence: B/N codebook; DUT 2.6 V = 0x20 and 3.0 V = 0xA0 verified 2026-10-09
+    note: B/N mapping selected by DUT evidence; A has an older conflicting map. Setting encoding validated, not physical cutoff accuracy. At or below 2.7 V protection is software-only per B/N.
+    description: '**A:** 0â€“4 = 2.8/2.9/3.0/3.1/3.2 V per cell; 5â€“7 unspecified. **B:** 0â€“7 = 2.5 through 3.2 V per cell in 0.1 V increments. Also affects precharge-to-CC threshold. B says â‰¤2.7 V has software-only low-voltage protection.'
+    access: R/W
+  - id: r0b_en_dc_dc_output
+    friendlydesc: "When 1, discharge output is permitted; this does not prove current flow."
+    name: En_Dc-Dc_Output
+    registers:
+      - 0x0B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x80
+    shift: 7
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: 1 enables discharge output; 0 disables it.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Discharge output disabled
+      "1":
+        status: "YES"
+        interpretation: Discharge output enabled; not proof of current flow
+  - id: r0b_en_vbus_src_dp_dm
+    friendlydesc: "When 1, output fast-charge negotiation over USB data pins is permitted."
+    name: En_Vbus_Src_DP_dM
+    registers:
+      - 0x0B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x40
+    shift: 6
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Output DP/DM fast-charge enable.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Output DP/DM fast-charge negotiation disabled
+      "1":
+        status: "YES"
+        interpretation: Output DP/DM fast-charge negotiation enabled
+  - id: r0b_en_vbus_srcpd
+    friendlydesc: "When 1, USB Power Delivery negotiation for supplying power is permitted."
+    name: En_Vbus_SrcPd
+    registers:
+      - 0x0B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x20
+    shift: 5
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Output PD enable.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Output PD negotiation disabled
+      "1":
+        status: "YES"
+        interpretation: Output PD negotiation enabled
+  - id: r0b_en_vbus_srcscp
+    friendlydesc: "When 1, SCP fast-charge negotiation for supplying power is permitted."
+    name: En_Vbus_SrcSCP
+    registers:
+      - 0x0B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x10
+    shift: 4
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Output SCP enable.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Output SCP negotiation disabled
+      "1":
+        status: "YES"
+        interpretation: Output SCP negotiation enabled
+  - id: r0c_vbus_src_power
+    friendlydesc: "Power limit for input and output. Charging is additionally constrained by Bat_Cur."
+    name: Input/output power setting
+    registers:
+      - 0x0C
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xE0
+    shift: 5
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum:
+      "0": 30 W
+      "1": 45 W
+      "2": 60 W
+      "3": 65 W
+      "4": 100 W
+      "5": 140 W
+    valid_min: 0
+    valid_max: 7
+    evidence: A/N input-output scope; DUT UI and behavior verified 2026-10-09
+    note: Input/output power setting, not measured power. DUT names it In/Out Power; input is additionally configurable through Bat_Cur. Write precedence with PDO settings remains unverified.
+    description: 'Codes 0/1/2/3/4/5 = 30/45/60/65/100/140 W. Codes 6/7 undefined. A calls it input/output selection; B calls it output. A says writes interact with PDO settings: later writes override earlier ones.'
+    access: R/W
+  - id: r0d_pdo_select
+    friendlydesc: "Fixed input-voltage choice from available PD offers. Write access is disputed."
+    name: Pdo_select
+    registers:
+      - 0x0D
+    # Parse observed reads/writes; this is not authorization for an active data write.
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x07
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum:
+      "0": Automatic selection
+      "1": 5 V
+      "2": 9 V
+      "3": 12 V
+      "4": 15 V
+      "5": 20 V
+    valid_min: 0
+    valid_max: 7
+    evidence: N V1.14 page 7; B codebook conflicts; DUT observation 2026-10-09
+    note: 'Corrected DUT observation 2026-10-09: actual value is 0; the previously reported 7 was mask 0x07, not readback. Code 0 with negotiated 20 V supports automatic selection. A 28 V-capable supply did not yield 28 V input in this setup. Codes 6/7 remain undefined. Write access remains disputed; no active data writes authorized.'
+    description: 'N V1.14 input fixed PDO selection: 0 automatic, 1/2/3/4/5 = 5/9/12/15/20 V; codes 6/7 undefined. B assigns different codes. DUT reads 0 while negotiating 20 V, consistent with automatic selection. Check offered PDO availability in 0x35.'
+    access: R
+  - id: r22_vbus_mode_set
+    friendlydesc: "USB-C role: sink receives power, source supplies it, DRP allows either. Code 2 is undefined."
+    name: Vbus_Mode_Set
+    registers:
+      - 0x22
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xC0
+    shift: 6
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum:
+      "0": UFP/sink
+      "1": DFP/source
+      "3": DRP
+    valid_min: 0
+    valid_max: 3
+    evidence: A/B default conflict
+    note: Reset differs A/B; code 2 undefined.
+    description: 0 UFP/sink; 1 DFP/source; 3 DRP; 2 undefined.
+    access: R/W
+  - id: r23_en_5vpdo_3a_2_4a
+    friendlydesc: "Default current advertised for the 5 V PD offer. Custom-current interaction is unresolved."
+    name: En_5VPdo_3A/2.4A
+    registers:
+      - 0x23
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x80
+    shift: 7
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum:
+      "0": 2400 mA
+      "1": 3000 mA
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: Default PDO choice; custom-current interaction unresolved.
+    description: 'Default 5 V PDO current choice: 1 = 3 A; 0 = 2.4 A. Interaction with custom-current enable needs validation.'
+    access: R/W
+  - id: r23_en_pps2pdo_iset
+    friendlydesc: "When 1, the custom PPS2 current setting in 0x2A is enabled."
+    name: En_Pps2Pdo_Iset
+    registers:
+      - 0x23
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x40
+    shift: 6
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Enable custom PPS2 current from `0x2A`.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Custom PPS2 current setting disabled
+      "1":
+        status: "YES"
+        interpretation: Custom PPS2 current setting enabled
+  - id: r23_en_pps1pdo_iset
+    friendlydesc: "When 1, the custom PPS1 current setting in 0x29 is enabled."
+    name: En_Pps1Pdo_Iset
+    registers:
+      - 0x23
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x20
+    shift: 5
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Enable custom PPS1 current from `0x29`.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Custom PPS1 current setting disabled
+      "1":
+        status: "YES"
+        interpretation: Custom PPS1 current setting enabled
+  - id: r23_en_20vpdo_iset
+    friendlydesc: "When 1, the custom 20 V PD current setting in 0x28 is enabled."
+    name: En_20VPdo_Iset
+    registers:
+      - 0x23
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x10
+    shift: 4
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Enable custom 20 V current from `0x28`.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Custom 20 V PDO current setting disabled
+      "1":
+        status: "YES"
+        interpretation: Custom 20 V PDO current setting enabled
+  - id: r23_en_15vpdo_iset
+    friendlydesc: "When 1, the custom 15 V PD current setting in 0x27 is enabled."
+    name: En_15VPdo_Iset
+    registers:
+      - 0x23
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x08
+    shift: 3
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Enable custom 15 V current from `0x27`.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Custom 15 V PDO current setting disabled
+      "1":
+        status: "YES"
+        interpretation: Custom 15 V PDO current setting enabled
+  - id: r23_en_12vpdo_iset
+    friendlydesc: "When 1, the custom 12 V PD current setting in 0x26 is enabled."
+    name: En_12VPdo_Iset
+    registers:
+      - 0x23
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x04
+    shift: 2
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Enable custom 12 V current from `0x26`.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Custom 12 V PDO current setting disabled
+      "1":
+        status: "YES"
+        interpretation: Custom 12 V PDO current setting enabled
+  - id: r23_en_9vpdo_iset
+    friendlydesc: "When 1, the custom 9 V PD current setting in 0x25 is enabled."
+    name: En_9VPdo_Iset
+    registers:
+      - 0x23
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x02
+    shift: 1
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Enable custom 9 V current from `0x25`.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Custom 9 V PDO current setting disabled
+      "1":
+        status: "YES"
+        interpretation: Custom 9 V PDO current setting enabled
+  - id: r23_en_5vpdo_iset
+    friendlydesc: "When 1, the custom 5 V PD current setting in 0x24 is enabled."
+    name: En_5VPdo_Iset
+    registers:
+      - 0x23
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x01
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Enable custom 5 V current from `0x24`.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Custom 5 V PDO current setting disabled
+      "1":
+        status: "YES"
+        interpretation: Custom 5 V PDO current setting enabled
+  - id: r24_5vpdo_iset
+    friendlydesc: "Base advertised current for the 5 V PD offer. Add bit, enable, cable and negotiation limits still apply."
+    name: 5 V PDO base current
+    registers:
+      - 0x24
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 20
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 255
+    evidence: A/B
+    note: Base setting only; excludes 10 mA add bit in 0x2C[0], enable state, cable limits and negotiated current.
+    description: Source 5 V advertised current `20k` mA, plus add bit from `0x2C[0]`. B states maximum 3 A.
+    access: R/W
+  - id: r25_9vpdo_iset
+    friendlydesc: "Base advertised current for the 9 V PD offer. Add bit, enable, cable and negotiation limits still apply."
+    name: 9 V PDO base current
+    registers:
+      - 0x25
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 20
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 255
+    evidence: A/B
+    note: Base setting only; excludes 10 mA add bit in 0x2C[1], enable state, cable limits and negotiated current.
+    description: Source 9 V current `20k` mA, plus `0x2C[1]`. B maximum 3 A.
+    access: R/W
+  - id: r26_12vpdo_iset
+    friendlydesc: "Base advertised current for the 12 V PD offer. Add bit, enable, cable and negotiation limits still apply."
+    name: 12 V PDO base current
+    registers:
+      - 0x26
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 20
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 255
+    evidence: A/B
+    note: Base setting only; excludes 10 mA add bit in 0x2C[2], enable state, cable limits and negotiated current.
+    description: Source 12 V current `20k` mA, plus `0x2C[2]`. B maximum 3 A.
+    access: R/W
+  - id: r27_15vpdo_iset
+    friendlydesc: "Base advertised current for the 15 V PD offer. Add bit, enable, cable and negotiation limits still apply."
+    name: 15 V PDO base current
+    registers:
+      - 0x27
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 20
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 255
+    evidence: A/B
+    note: Base setting only; excludes 10 mA add bit in 0x2C[3], enable state, cable limits and negotiated current.
+    description: Source 15 V current `20k` mA, plus `0x2C[3]`. B maximum 3 A.
+    access: R/W
+  - id: r28_20vpdo_iset
+    friendlydesc: "Base advertised current for the 20 V PD offer. Add bit, enable, cable and negotiation limits still apply."
+    name: 20 V PDO base current
+    registers:
+      - 0x28
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 20
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 255
+    evidence: A/B
+    note: Base setting only; excludes 10 mA add bit in 0x2C[4], enable state, cable limits and negotiated current.
+    description: Source 20 V current `20k` mA, plus `0x2C[4]`. B maximum 5 A with cable recognition, otherwise 3 A.
+    access: R/W
+  - id: r29_pps1pdo_iset
+    friendlydesc: "Advertised PPS1 current setting, not negotiated or measured current. Enable and cable limits apply."
+    name: PPS1 programmed current
+    registers:
+      - 0x29
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 50
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 255
+    evidence: A/B
+    note: Programmed value, not negotiated current; enable/cable limits apply. Default 0x3C means 3000 mA.
+    description: PPS1 source advertised current `50k` mA. B discusses up to 5 A with cable recognition, otherwise 3 A, but its default prose contradicts field value.
+    access: R/W
+  - id: r2a_pps2pdo_iset
+    friendlydesc: "Advertised PPS2 current setting, not negotiated or measured current. Enable and cable limits apply."
+    name: PPS2 programmed current
+    registers:
+      - 0x2A
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0xFF
+    shift: 0
+    scale: 50
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 255
+    evidence: A/B
+    note: Programmed value, not negotiated current; enable/cable limits apply. Default 0x3C means 3000 mA.
+    description: PPS2 source current `50k` mA; same caveat as PPS1.
+    access: R/W
+  - id: r2b_en_src_pps2pdo
+    friendlydesc: "When 1, the PPS2 programmable PD offer is advertised; it need not be selected."
+    name: En_Src_Pps2Pdo
+    registers:
+      - 0x2B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x40
+    shift: 6
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Advertise PPS2 when 1.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: PPS2 PDO not advertised
+      "1":
+        status: "YES"
+        interpretation: PPS2 PDO advertising enabled
+  - id: r2b_en_src_pps1pdo
+    friendlydesc: "When 1, the PPS1 programmable PD offer is advertised; it need not be selected."
+    name: En_Src_Pps1Pdo
+    registers:
+      - 0x2B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x20
+    shift: 5
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Advertise PPS1 when 1.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: PPS1 PDO not advertised
+      "1":
+        status: "YES"
+        interpretation: PPS1 PDO advertising enabled
+  - id: r2b_en_src_20vpdo
+    friendlydesc: "When 1, the fixed 20 V PD offer is advertised; it need not be selected."
+    name: En_Src_20VPdo
+    registers:
+      - 0x2B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x10
+    shift: 4
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Advertise fixed 20 V when 1.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: 20 V PDO not advertised
+      "1":
+        status: "YES"
+        interpretation: 20 V PDO advertising enabled
+  - id: r2b_en_src_15vpdo
+    friendlydesc: "When 1, the fixed 15 V PD offer is advertised; it need not be selected."
+    name: En_Src_15VPdo
+    registers:
+      - 0x2B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x08
+    shift: 3
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Advertise fixed 15 V when 1.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: 15 V PDO not advertised
+      "1":
+        status: "YES"
+        interpretation: 15 V PDO advertising enabled
+  - id: r2b_en_src_12vpdo
+    friendlydesc: "When 1, the fixed 12 V PD offer is advertised; it need not be selected."
+    name: En_Src_12VPdo
+    registers:
+      - 0x2B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x04
+    shift: 2
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Advertise fixed 12 V when 1.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: 12 V PDO not advertised
+      "1":
+        status: "YES"
+        interpretation: 12 V PDO advertising enabled
+  - id: r2b_en_src_9vpdo
+    friendlydesc: "When 1, the fixed 9 V PD offer is advertised; it need not be selected."
+    name: En_Src_9VPdo
+    registers:
+      - 0x2B
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x02
+    shift: 1
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Advertise fixed 9 V when 1. Bits 7 and 0 are reserved.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: 9 V PDO not advertised
+      "1":
+        status: "YES"
+        interpretation: 9 V PDO advertising enabled
+  - id: r2c_en_20vpdo_add
+    friendlydesc: "When 1, 10 mA is added to the programmed 20 V PD advertised current."
+    name: EN_20VPDO_ADD
+    registers:
+      - 0x2C
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x10
+    shift: 4
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Add 10 mA to programmed 20 V PDO current.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: 20 V PDO 10 mA increment disabled
+      "1":
+        status: "YES"
+        interpretation: 20 V PDO 10 mA increment enabled
+  - id: r2c_en_15vpdo_add
+    friendlydesc: "When 1, 10 mA is added to the programmed 15 V PD advertised current."
+    name: EN_15VPDO_ADD
+    registers:
+      - 0x2C
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x08
+    shift: 3
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Add 10 mA to 15 V PDO current.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: 15 V PDO 10 mA increment disabled
+      "1":
+        status: "YES"
+        interpretation: 15 V PDO 10 mA increment enabled
+  - id: r2c_en_12vpdo_add
+    friendlydesc: "When 1, 10 mA is added to the programmed 12 V PD advertised current."
+    name: EN_12VPDO_ADD
+    registers:
+      - 0x2C
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x04
+    shift: 2
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Add 10 mA to 12 V PDO current.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: 12 V PDO 10 mA increment disabled
+      "1":
+        status: "YES"
+        interpretation: 12 V PDO 10 mA increment enabled
+  - id: r2c_en_9vpdo_add
+    friendlydesc: "When 1, 10 mA is added to the programmed 9 V PD advertised current."
+    name: EN_9VPDO_ADD
+    registers:
+      - 0x2C
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x02
+    shift: 1
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Add 10 mA to 9 V PDO current.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: 9 V PDO 10 mA increment disabled
+      "1":
+        status: "YES"
+        interpretation: 9 V PDO 10 mA increment enabled
+  - id: r2c_en_5vpdo_add
+    friendlydesc: "When 1, 10 mA is added to the programmed 5 V PD advertised current."
+    name: EN_5VPDO_ADD
+    registers:
+      - 0x2C
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x01
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Add 10 mA to 5 V PDO current.
+    access: R/W
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: 5 V PDO 10 mA increment disabled
+      "1":
+        status: "YES"
+        interpretation: 5 V PDO 10 mA increment enabled
+  - id: r31_chg_en
+    friendlydesc: "When 1, charging context is indicated, including VBUS presence; battery current need not flow."
+    name: CHG_En
+    registers:
+      - 0x31
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x20
+    shift: 5
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Charging-context flag; VbusOk counts. Does not prove nonzero BAT current.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Charging context not indicated
+      "1":
+        status: "YES"
+        interpretation: Charging context indicated; VBUS presence counts, not proof of BAT current
+  - id: r31_chg_end
+    friendlydesc: "When 1, charging has ended, typically because the battery is full."
+    name: CHG_End
+    registers:
+      - 0x31
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x10
+    shift: 4
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: 1 indicates full/charge complete.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Charge completion not indicated
+      "1":
+        status: "YES"
+        interpretation: Charge complete/full indicated
+  - id: r31_output_en
+    friendlydesc: "When 1, discharge output is open without a reported abnormality."
+    name: Output_En
+    registers:
+      - 0x31
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x08
+    shift: 3
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: 1 discharge output open without reported abnormality.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Output not open or discharge abnormality
+      "1":
+        status: "YES"
+        interpretation: Discharge output open without indicated abnormality
+  - id: r31_chg_state
+    friendlydesc: "Charging stage: trickle, constant current (CC), constant voltage (CV), waiting, full or timeout."
+    name: Chg_state
+    registers:
+      - 0x31
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x07
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum:
+      "0": standby
+      "1": trickle
+      "2": CC
+      "3": CV
+      "4": waiting
+      "5": full
+      "6": timeout
+    valid_min: 0
+    valid_max: 7
+    evidence: A/B
+    note: ""
+    description: 0 standby; 1 trickle; 2 CC; 3 CV; 4 waiting; 5 full; 6 timeout; 7 undefined.
+    access: R
+  - id: r32_chg_state
+    friendlydesc: "Code 0: 5 V input charging. Code 1: high-voltage fast charging. Other codes are undocumented."
+    name: Chg_State
+    registers:
+      - 0x32
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0xC0
+    shift: 6
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum:
+      "0": 5 V input charging
+      "1": high-voltage fast charging
+    valid_min: 0
+    valid_max: 3
+    evidence: A/B
+    note: ""
+    description: 0 = 5 V input charging; 1 = high-voltage fast charging. Other codes unspecified.
+    access: R
+  - id: r33_vbus_ok
+    friendlydesc: "When 1, USB power supply presence is indicated."
+    name: Vbus_Ok
+    registers:
+      - 0x33
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x80
+    shift: 7
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: VBUS powered/present.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: VBUS supply not indicated
+      "1":
+        status: "YES"
+        interpretation: VBUS supply present
+  - id: r33_vbus_ov
+    friendlydesc: "When 1, USB input overvoltage is indicated."
+    name: Vbus_Ov
+    registers:
+      - 0x33
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x40
+    shift: 6
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: VBUS input overvoltage flag.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: VBUS input overvoltage not indicated
+      "1":
+        status: "YES"
+        interpretation: VBUS input overvoltage indicated
+  - id: r33_chg_vbus
+    friendlydesc: "Reported USB input-voltage category, not a voltage request."
+    name: Chg_Vbus
+    registers:
+      - 0x33
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x07
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum:
+      "1": 5 V
+      "2": 7 V
+      "3": 9 V
+      "4": 12 V
+      "5": 15 V
+      "6": 20 V
+      "7": 28 V
+    valid_min: 0
+    valid_max: 7
+    evidence: A/N codebook; DUT code 6 with independently verified 20 V input 2026-10-09
+    note: A/N mapping selected; code 6 = 20 V verified. Other categories documented, not individually tested. Code 0 observed before connection, meaning undefined. B has a conflicting map.
+    description: 'Codes 1-7 = 5/7/9/12/15/20/28 V. Code 0 undefined. Input category, not an input capability guarantee.'
+    access: R
+  - id: r34_sink_ok
+    friendlydesc: "When 1, a valid USB-C connection for receiving power is indicated."
+    name: Sink_Ok
+    registers:
+      - 0x34
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x80
+    shift: 7
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Valid Type-C sink connection.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: No valid Type-C sink connection indicated
+      "1":
+        status: "YES"
+        interpretation: Valid Type-C sink connection
+  - id: r34_src_ok
+    friendlydesc: "When 1, a valid USB-C connection for supplying power is indicated."
+    name: Src_Ok
+    registers:
+      - 0x34
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x40
+    shift: 6
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Valid Type-C source connection.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: No valid Type-C source connection indicated
+      "1":
+        status: "YES"
+        interpretation: Valid Type-C source connection
+  - id: r34_src_pd_ok
+    friendlydesc: "When 1, a valid Power Delivery connection for supplying power is indicated."
+    name: Src_Pd_Ok
+    registers:
+      - 0x34
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x20
+    shift: 5
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Source-side PD connection valid.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: No valid source PD connection indicated
+      "1":
+        status: "YES"
+        interpretation: Valid source PD connection
+  - id: r34_sink_pd_ok
+    friendlydesc: "When 1, a valid Power Delivery connection for receiving power is indicated."
+    name: Sink_Pd_Ok
+    registers:
+      - 0x34
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x10
+    shift: 4
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Sink-side PD connection valid.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: No valid sink PD connection indicated
+      "1":
+        status: "YES"
+        interpretation: Valid sink PD connection
+  - id: r34_vbus_sink_qc_ok
+    friendlydesc: "When 1, input fast charging is indicated. QC/PD at 5 V is excluded."
+    name: Vbus_Sink_Qc_Ok
+    registers:
+      - 0x34
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x08
+    shift: 3
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Input fast-charge flag; QC5V/PD5V excluded from fast-charge indication.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Input fast-charge indication not asserted; excludes QC/PD 5 V
+      "1":
+        status: "YES"
+        interpretation: Input fast-charge valid; excludes QC/PD 5 V
+  - id: r34_vbus_src_qc_ok
+    friendlydesc: "When 1, output fast charging is indicated. QC/PD at 5 V is excluded."
+    name: Vbus_Src_Qc_Ok
+    registers:
+      - 0x34
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x04
+    shift: 2
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: ""
+    description: Output fast-charge flag; QC5V/PD5V excluded.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Output fast-charge indication not asserted; excludes QC/PD 5 V
+      "1":
+        status: "YES"
+        interpretation: Output fast-charge valid; excludes QC/PD 5 V
+  - id: r35_pdo_20v
+    friendlydesc: "When 1, a fixed 20 V PD offer is available; it need not be selected."
+    name: PDO_20V
+    registers:
+      - 0x35
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x10
+    shift: 4
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: B only + C
+    note: ""
+    description: Received/available fixed 20 V PDO flag. No current value.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: "No fixed 20 V PD offer received/available."
+      "1":
+        status: "YES"
+        interpretation: "Fixed 20 V PD offer received/available; it need not be selected."
+  - id: r35_pdo_15v
+    friendlydesc: "When 1, a fixed 15 V PD offer is available; it need not be selected."
+    name: PDO_15V
+    registers:
+      - 0x35
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x08
+    shift: 3
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: B only + C
+    note: ""
+    description: Fixed 15 V received/available.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: "No fixed 15 V PD offer received/available."
+      "1":
+        status: "YES"
+        interpretation: "Fixed 15 V PD offer received/available; it need not be selected."
+  - id: r35_pdo_12v
+    friendlydesc: "When 1, a fixed 12 V PD offer is available; it need not be selected."
+    name: PDO_12V
+    registers:
+      - 0x35
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x04
+    shift: 2
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: B only + C
+    note: ""
+    description: Fixed 12 V received/available.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: "No fixed 12 V PD offer received/available."
+      "1":
+        status: "YES"
+        interpretation: "Fixed 12 V PD offer received/available; it need not be selected."
+  - id: r35_pdo_9v
+    friendlydesc: "When 1, a fixed 9 V PD offer is available; it need not be selected."
+    name: PDO_9V
+    registers:
+      - 0x35
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x02
+    shift: 1
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: B only + C
+    note: ""
+    description: Fixed 9 V received/available.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: "No fixed 9 V PD offer received/available."
+      "1":
+        status: "YES"
+        interpretation: "Fixed 9 V PD offer received/available; it need not be selected."
+  - id: r35_pdo_5v
+    friendlydesc: "When 1, a fixed 5 V PD offer is available; it need not be selected."
+    name: PDO_5V
+    registers:
+      - 0x35
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x01
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: B only + C
+    note: ""
+    description: Fixed 5 V received/available. Bits 7:5 reserved.
+    access: R
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: "No fixed 5 V PD offer received/available."
+      "1":
+        status: "YES"
+        interpretation: "Fixed 5 V PD offer received/available; it need not be selected."
+  - id: r38_vsys_oc
+    friendlydesc: "When 1, output overcurrent is latched; the event may have ended. Clearing access is unresolved."
+    name: Vsys_Oc
+    registers:
+      - 0x38
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x20
+    shift: 5
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B inconsistency
+    note: Fault indication; write-one-to-clear access is unresolved.
+    description: Latched output overcurrent; prose says write 1 to clear despite R column.
+    access: R / W1C?
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: No latched VSYS overcurrent indication
+      "1":
+        status: "YES"
+        interpretation: Latched VSYS overcurrent indication; not necessarily a current fault
+  - id: r38_vsys_scdt
+    friendlydesc: "When 1, an output short circuit is latched; the event may have ended. Clearing access is unresolved."
+    name: Vsys_Scdt
+    registers:
+      - 0x38
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x10
+    shift: 4
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: A/B
+    note: Fault indication; write-one-to-clear access is unresolved.
+    description: Latched output short-circuit; same access inconsistency.
+    access: R / W1C?
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: No latched VSYS short-circuit indication
+      "1":
+        status: "YES"
+        interpretation: Latched VSYS short-circuit indication; not necessarily a current fault
+  - id: battery_voltage_mv
+    friendlydesc: "Battery-pack voltage, assembled from low and high bytes; not per-cell voltage."
+    name: Battery voltage
+    atomic_step: 100
+    atomic_step_basis: Display policy; 100 mV pack-voltage changes. V1.14 p14 documents mV/code, not this attention threshold.
+    registers:
+      - 0x50
+      - 0x51
+    operation: read
+    assembly: consecutive_target_reads
+    encoding: uint_le
+    mask: 0xFFFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: mV
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 65535
+    evidence: See measurement row in reference
+    note: ""
+  - id: system_voltage_mv
+    friendlydesc: "Voltage at VSYS, not necessarily the USB VBUS node."
+    name: System voltage
+    atomic_step: 100
+    atomic_step_basis: Display policy; 100 mV node-voltage changes. Existing reference defines mV/code; not a noise or accuracy specification.
+    registers:
+      - 0x52
+      - 0x53
+    operation: read
+    assembly: consecutive_target_reads
+    encoding: uint_le
+    mask: 0xFFFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: mV
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 65535
+    evidence: See measurement row in reference
+    note: VSYS node; not automatically USB VBUS.
+  - id: battery_current_code_ma
+    friendlydesc: "Battery-current magnitude in mA; charging or discharging direction is separate."
+    name: Battery current
+    atomic_step: 100
+    atomic_step_basis: Display policy; 100 mA attention increment, not measurement accuracy.
+    registers:
+      - 0x6E
+      - 0x6F
+    operation: read
+    assembly: consecutive_target_reads
+    encoding: uint_le
+    mask: 0xFFFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 65535
+    evidence: See measurement row in reference
+    note: DUT independently verified 0x07A3 = 1955 mA charging and 0x07D1 = 2001 mA discharging, 2026-10-09. Positive magnitude in both directions; do not infer direction from sign.
+  - id: system_current_code_ma
+    friendlydesc: "System-current magnitude in mA; power-flow direction is separate."
+    name: System current
+    atomic_step: 100
+    atomic_step_basis: Display policy; 100 declared mA units. Existing unsigned interpretation retained; not a claim about current accuracy.
+    registers:
+      - 0x70
+      - 0x71
+    operation: read
+    assembly: consecutive_target_reads
+    encoding: uint_le
+    mask: 0xFFFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: mA
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 65535
+    evidence: See measurement row in reference
+    note: DUT independently verified 0x0576 = 1398 mA charging and 0x057E = 1406 mA discharging, 2026-10-09. Positive magnitude in both directions. Exact measurement-node attribution not separately established.
+  - id: system_power_mw
+    friendlydesc: "USB-side power magnitude in mW, for either charging or discharging."
+    name: USB power
+    atomic_step: 1000
+    atomic_step_basis: Display policy; 1 W attention increment. V1.14 p17 documents 10 mW/code; threshold is not measurement resolution.
+    registers:
+      - 0x74
+      - 0x75
+    operation: read
+    assembly: consecutive_target_reads
+    encoding: uint_le
+    mask: 0xFFFF
+    shift: 0
+    scale: 10
+    offset: 0
+    unit: mW
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 65535
+    evidence: See measurement row in reference
+    note: 'A/N specify 10 mW/code. DUT USB-side verification 2026-10-09: 0x0AC8 = 27600 mW charging; 0x0B09 = 28250 mW discharging. Positive magnitude in both directions.'
+  - id: ntc_voltage_mv
+    friendlydesc: "Battery thermistor input voltage, not temperature. Conversion requires the board's thermistor network."
+    name: NTC voltage
+    atomic_step: 10
+    atomic_step_basis: Display policy; 10 mV attention increment requested for NTC. V1.14 p17 documents mV and 0-3.3 V; no temperature conversion implied.
+    registers:
+      - 0x78
+      - 0x79
+    operation: read
+    assembly: consecutive_target_reads
+    encoding: uint_le
+    mask: 0xFFFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: mV
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 3300
+    evidence: See measurement row in reference
+    note: No temperature conversion; thermistor and board network required.
+  - id: identification_1
+    friendlydesc: "Character 1 of the five-byte manufacturer identifier; format is manufacturer-defined."
+    name: Manufacturer identifier character 1
+    registers:
+      - 0x69
+    operation: read
+    assembly: single
+    encoding: ascii
+    mask: 0xFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 127
+    evidence: See measurement row in reference
+    note: Manufacturer-defined five-byte ASCII identifier at 0x69-0x6D; DUT reads YLSII, 2026-10-09. Not a timestamp on this DUT; model/version/date encoding is manufacturer-defined.
+  - id: identification_2
+    friendlydesc: "Character 2 of the five-byte manufacturer identifier; format is manufacturer-defined."
+    name: Manufacturer identifier character 2
+    registers:
+      - 0x6A
+    operation: read
+    assembly: single
+    encoding: ascii
+    mask: 0xFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 127
+    evidence: See measurement row in reference
+    note: Manufacturer-defined five-byte ASCII identifier at 0x69-0x6D; DUT reads YLSII, 2026-10-09. Not a timestamp on this DUT; model/version/date encoding is manufacturer-defined.
+  - id: identification_3
+    friendlydesc: "Character 3 of the five-byte manufacturer identifier; format is manufacturer-defined."
+    name: Manufacturer identifier character 3
+    registers:
+      - 0x6B
+    operation: read
+    assembly: single
+    encoding: ascii
+    mask: 0xFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 127
+    evidence: See measurement row in reference
+    note: Manufacturer-defined five-byte ASCII identifier at 0x69-0x6D; DUT reads YLSII, 2026-10-09. Not a timestamp on this DUT; model/version/date encoding is manufacturer-defined.
+  - id: identification_4
+    friendlydesc: "Character 4 of the five-byte manufacturer identifier; format is manufacturer-defined."
+    name: Manufacturer identifier character 4
+    registers:
+      - 0x6C
+    operation: read
+    assembly: single
+    encoding: ascii
+    mask: 0xFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 127
+    evidence: See measurement row in reference
+    note: Manufacturer-defined five-byte ASCII identifier at 0x69-0x6D; DUT reads YLSII, 2026-10-09. Not a timestamp on this DUT; model/version/date encoding is manufacturer-defined.
+  - id: identification_5
+    friendlydesc: "Character 5 of the five-byte manufacturer identifier; format is manufacturer-defined."
+    name: Manufacturer identifier character 5
+    registers:
+      - 0x6D
+    operation: read
+    assembly: single
+    encoding: ascii
+    mask: 0xFF
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 127
+    evidence: See measurement row in reference
+    note: Manufacturer-defined five-byte ASCII identifier at 0x69-0x6D; DUT reads YLSII, 2026-10-09. Not a timestamp on this DUT; model/version/date encoding is manufacturer-defined.
+  - id: ntc_excitation_ua
+    friendlydesc: "Thermistor excitation-current setting, not battery current or temperature."
+    name: NTC excitation current
+    registers:
+      - 0x77
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x80
+    shift: 7
+    scale: 1
+    offset: 0
+    unit: ""
+    precision: 0
+    enum:
+      "0": 20 uA
+      "1": 80 uA
+    valid_min: 0
+    valid_max: 1
+    evidence: See measurement row in reference
+    note: ""
+  - id: r04_bat_num
+    friendlydesc: "Number of battery cells in series; the value directly gives the cell count."
+    name: Battery series-cell count
+    registers:
+      - 0x04
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x07
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: cells
+    precision: 0
+    enum: {}
+    valid_min: 2
+    valid_max: 6
+    evidence: DUT 4S/code 4 on 2026-10-07; changed series-cell settings tracked directly on 2026-10-09
+    note: DUT changing series-cell settings changed the register number accordingly, experimentally verified 2026-10-09. Initial 4S/code 4 observation retained. Field absent from supplied IP2366 manuals.
+    access: R/W (inferred)
+    description: Bat_Num bits 2:0; inferred direct series-cell count. Bits 7:3 preserved, with no assigned meaning.
+  - id: r17_ntc_en
+    friendlydesc: "When 1, battery NTC temperature protection is enabled; not an active fault indication."
+    name: NTC_EN
+    registers:
+      - 0x17
+    operation: read_write
+    assembly: single
+    encoding: uint
+    mask: 0x80
+    shift: 7
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: User experimental setting comparison 2026-10-09; enabled 0x80, disabled 0x00
+    note: DUT setting comparison verified 2026-10-09; enabled = 0x80, disabled = 0x00. Field absent from supplied manuals. Mapping is not a test of actual protection trip behavior.
+    description: Bit 7 enables battery NTC temperature protection; 1 enabled, 0 disabled. DUT settings and register polarity experimentally verified.
+    access: R/W (inferred)
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Battery NTC temperature protection disabled
+      "1":
+        status: "YES"
+        interpretation: Battery NTC temperature protection enabled
+  - id: r3a_thermal_loop
+    friendlydesc: "When 1, internal thermal regulation is active. Separate from battery NTC protection."
+    name: Thermal_loop
+    registers:
+      - 0x3A
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x80
+    shift: 7
+    scale: 1
+    offset: 0
+    unit: code
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 1
+    evidence: User experimental confirmation 2026-10-09; thermal regulation active flag
+    note: DUT reports experimental confirmation of active-loop meaning/polarity, 2026-10-09. Exact threshold unverified; separate from battery NTC protection. Field absent from supplied manuals.
+    description: 1 indicates thermal loop active; 0 inactive. Not the external battery NTC temperature or its enable setting.
+    access: R (inferred)
+    bit_meanings:
+      "0":
+        status: "NO"
+        interpretation: Internal die thermal loop inactive
+      "1":
+        status: "YES"
+        interpretation: Internal die thermal loop active
+  - id: r3a_ic_temp
+    friendlydesc: "Inferred chip temperature in degC, valid even when the thermal-loop flag is 0; not independently calibrated."
+    name: Internal die temperature
+    atomic_step: 1
+    atomic_step_basis: Display policy; 1 degC using the existing bench-supported inferred encoding. No new manufacturer confirmation or calibration implied.
+    registers:
+      - 0x3A
+    operation: read
+    assembly: single
+    encoding: uint
+    mask: 0x7F
+    shift: 0
+    scale: 1
+    offset: 0
+    unit: degC
+    precision: 0
+    enum: {}
+    valid_min: 0
+    valid_max: 127
+    evidence: User passive capture; plausible room/light-load result, not independent calibration
+    note: INFERRED; observed 0x1E interpreted as 30 degC, plausible but not independently calibrated. Unsigned encoding/range and variant applicability unverified; not battery NTC temperature or for protection/control.
+    description: 'Inferred unsigned direct temperature in degrees Celsius: `temperature_degC = byte & 0x7F`. User observed `0x1E`, interpreted as 30 degrees Celsius.'
+    access: R (inferred)
+unresolved:
+  - '0x01: no verified encoding'
+  - '0x04/0x17/0x3A: DUT-supported field meanings absent from supplied manuals; full variant applicability and calibration not established.'
+  - '0x54/0x7A/0x7C/0x7E/0x80: unverified leads'
+  - '0x56/0x57: stray A page 14 sentence, no verified complete field contract'
+  - '0x0A and 0x33: historical conflicting maps retained in MD; working YAML uses DUT-supported newer/Chinese maps.'
+  - Current direction must be established separately from positive magnitude; exact system-current node not separately established.
+  - PDO effective current requires independent 0x2C/enable/cable state
